@@ -22,6 +22,12 @@ Abrir: http://127.0.0.1:5000
 	- Start Command: `gunicorn app:app --bind 0.0.0.0:$PORT`
 	- Root Directory: `nota_proceso_flask`
 	- Variable `DATABASE_URL`: conexión PostgreSQL (si usas `render.yaml`, se configura sola)
+	- Variable `SECRET_KEY`: clave secreta Flask (obligatoria en producción)
+	- Variable `GOOGLE_CLIENT_ID`: OAuth Client ID de Google
+	- Variable `GOOGLE_CLIENT_SECRET`: OAuth Client Secret de Google
+	- Variable `ADMIN_EMAIL`: correo Google del administrador
+	- Variable `COLLAB_EMAIL`: correo Google del docente colaborador
+	- Opcional: `ADMIN_NAME` y `COLLAB_NAME`
 4. Deploy.
 
 ### Opción con archivo de configuración
@@ -44,6 +50,12 @@ Con eso tendrás persistencia real (no se pierde al reiniciar el servicio).
 - Si existe `DATABASE_URL`, la app guarda estado en PostgreSQL (tabla `app_state`).
 - Si no existe `DATABASE_URL`, usa `data.json` local como respaldo.
 - Recomendado: usar **Exportar JSON** regularmente como backup adicional.
+
+### Migración segura (usuarios)
+
+- Al iniciar con la nueva versión, se crean tablas `app_users` y `user_state`.
+- El contenido histórico de `app_state` se copia automáticamente al usuario `ADMIN_EMAIL` la primera vez.
+- No se elimina `app_state`, por lo que los datos previos no se pierden.
 
 ## Incluye
 

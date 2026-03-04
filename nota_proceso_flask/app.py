@@ -6,10 +6,12 @@ import os
 import threading
 import uuid
 from datetime import datetime
+from functools import wraps
 from pathlib import Path
 from statistics import mean
 
-from flask import Flask, jsonify, render_template, request, send_file
+from authlib.integrations.flask_client import OAuth
+from flask import Flask, jsonify, redirect, render_template, request, send_file, session, url_for
 from openpyxl import load_workbook
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4, landscape
@@ -21,11 +23,33 @@ from sqlalchemy.engine import Engine
 BASE_DIR = Path(__file__).resolve().parent
 DATA_FILE = BASE_DIR / "data.json"
 DATABASE_URL = (os.getenv("DATABASE_URL") or "").strip()
+SECRET_KEY = os.getenv("SECRET_KEY", "cambiar-esto-en-produccion")
+
+GOOGLE_CLIENT_ID = (os.getenv("GOOGLE_CLIENT_ID") or "").strip()
+GOOGLE_CLIENT_SECRET = (os.getenv("GOOGLE_CLIENT_SECRET") or "").strip()
+GOOGLE_DISCOVERY_URL = "https://accounts.google.com/.well-known/openid-configuration"
+
+ADMIN_EMAIL = (os.getenv("ADMIN_EMAIL") or "").strip().lower()
+ADMIN_NAME = (os.getenv("ADMIN_NAME") or "Administrador").strip()
+COLLAB_EMAIL = (os.getenv("COLLAB_EMAIL") or "").strip().lower()
+COLLAB_NAME = (os.getenv("COLLAB_NAME") or "Docente Colaborador").strip()
 
 WEIGHTS = {"C": 1.0, "I": 0.5, "S": 0.0}
 
 app = Flask(__name__)
+app.secret_key = SECRET_KEY
 lock = threading.Lock()
+
+oauth = OAuth(app)
+google_oauth_enabled = bool(GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET)
+if google_oauth_enabled:
+    oauth.register(
+        name="google",
+        client_id=GOOGLE_CLIENT_ID,
+        client_secret=GOOGLE_CLIENT_SECRET,
+        server_metadata_url=GOOGLE_DISCOVERY_URL,
+        client_kwargs={"scope": "openid email profile"},
+    )
 
 
 def normalize_database_url(raw_url: str) -> str:
@@ -45,6 +69,70 @@ def default_state() -> dict:
     return {"courses": {}}
 
 
+def normalize_email(email: str) -> str:
+    return (email or "").strip().lower()
+
+
+def _load_legacy_state_from_db(conn) -> dict:
+    row = conn.execute(text("SELECT data FROM app_state WHERE id = 1")).first()
+    if not row or not row[0]:
+        return default_state()
+    return json.loads(row[0])
+
+
+def _ensure_bootstrap_users(conn) -> None:
+    users_to_create = []
+    if ADMIN_EMAIL:
+        users_to_create.append({"email": ADMIN_EMAIL, "name": ADMIN_NAME, "role": "admin"})
+    if COLLAB_EMAIL:
+        users_to_create.append({"email": COLLAB_EMAIL, "name": COLLAB_NAME, "role": "collaborator"})
+
+    for u in users_to_create:
+        existing = conn.execute(
+            text("SELECT id FROM app_users WHERE email = :email"),
+            {"email": u["email"]},
+        ).first()
+        if existing:
+            conn.execute(
+                text(
+                    """
+                    UPDATE app_users
+                    SET name = :name, role = :role
+                    WHERE id = :id
+                    """
+                ),
+                {"id": existing[0], "name": u["name"], "role": u["role"]},
+            )
+        else:
+            conn.execute(
+                text(
+                    """
+                    INSERT INTO app_users (email, name, role)
+                    VALUES (:email, :name, :role)
+                    """
+                ),
+                u,
+            )
+
+
+def _ensure_user_state_row(conn, user_id: int, payload: dict | None = None) -> None:
+    existing = conn.execute(
+        text("SELECT user_id FROM user_state WHERE user_id = :user_id"),
+        {"user_id": user_id},
+    ).first()
+    if existing:
+        return
+    conn.execute(
+        text(
+            """
+            INSERT INTO user_state (user_id, data)
+            VALUES (:user_id, :data)
+            """
+        ),
+        {"user_id": user_id, "data": json.dumps(payload or default_state(), ensure_ascii=False)},
+    )
+
+
 def init_database_if_needed() -> None:
     if not engine:
         return
@@ -60,22 +148,73 @@ def init_database_if_needed() -> None:
                 """
             )
         )
-        row = conn.execute(text("SELECT id FROM app_state WHERE id = 1")).first()
-        if not row:
+        conn.execute(
+            text(
+                """
+                CREATE TABLE IF NOT EXISTS app_users (
+                    id SERIAL PRIMARY KEY,
+                    email TEXT NOT NULL UNIQUE,
+                    name TEXT NOT NULL,
+                    role TEXT NOT NULL,
+                    google_sub TEXT,
+                    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    last_login TIMESTAMP
+                )
+                """
+            )
+        )
+        conn.execute(
+            text(
+                """
+                CREATE TABLE IF NOT EXISTS user_state (
+                    user_id INTEGER PRIMARY KEY REFERENCES app_users(id) ON DELETE CASCADE,
+                    data TEXT NOT NULL,
+                    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+                )
+                """
+            )
+        )
+
+        legacy_row = conn.execute(text("SELECT id FROM app_state WHERE id = 1")).first()
+        if not legacy_row:
             conn.execute(
                 text("INSERT INTO app_state (id, data) VALUES (1, :data)"),
                 {"data": json.dumps(default_state(), ensure_ascii=False)},
             )
 
+        _ensure_bootstrap_users(conn)
+
+        if ADMIN_EMAIL:
+            admin = conn.execute(
+                text("SELECT id FROM app_users WHERE email = :email"),
+                {"email": ADMIN_EMAIL},
+            ).first()
+            if admin:
+                admin_id = int(admin[0])
+                admin_state = conn.execute(
+                    text("SELECT user_id FROM user_state WHERE user_id = :user_id"),
+                    {"user_id": admin_id},
+                ).first()
+                if not admin_state:
+                    legacy_payload = _load_legacy_state_from_db(conn)
+                    _ensure_user_state_row(conn, admin_id, legacy_payload)
+
+        users = conn.execute(text("SELECT id FROM app_users")).fetchall()
+        for u in users:
+            _ensure_user_state_row(conn, int(u[0]), default_state())
+
 
 init_database_if_needed()
 
 
-def load_state() -> dict:
+def load_state_for_user(user_id: int) -> dict:
     if engine:
         try:
             with engine.begin() as conn:
-                row = conn.execute(text("SELECT data FROM app_state WHERE id = 1")).first()
+                row = conn.execute(
+                    text("SELECT data FROM user_state WHERE user_id = :user_id"),
+                    {"user_id": user_id},
+                ).first()
                 if not row or not row[0]:
                     return default_state()
                 return json.loads(row[0])
@@ -90,36 +229,98 @@ def load_state() -> dict:
         return default_state()
 
 
-def save_state(state: dict) -> None:
+def save_state_for_user(user_id: int, state: dict) -> None:
     if engine:
         with engine.begin() as conn:
             payload = json.dumps(state, ensure_ascii=False)
             conn.execute(
                 text(
                     """
-                    INSERT INTO app_state (id, data, updated_at)
-                    VALUES (1, :data, CURRENT_TIMESTAMP)
-                    ON CONFLICT (id)
+                    INSERT INTO user_state (user_id, data, updated_at)
+                    VALUES (:user_id, :data, CURRENT_TIMESTAMP)
+                    ON CONFLICT (user_id)
                     DO UPDATE SET data = EXCLUDED.data, updated_at = CURRENT_TIMESTAMP
                     """
                 ),
-                {"data": payload},
+                {"user_id": user_id, "data": payload},
             )
         return
 
     DATA_FILE.write_text(json.dumps(state, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
+def get_user_by_id(user_id: int) -> dict | None:
+    if not engine:
+        return None
+    with engine.begin() as conn:
+        row = conn.execute(
+            text("SELECT id, email, name, role FROM app_users WHERE id = :id"),
+            {"id": user_id},
+        ).first()
+    if not row:
+        return None
+    return {"id": int(row[0]), "email": row[1], "name": row[2], "role": row[3]}
+
+
+def get_user_by_email(email: str) -> dict | None:
+    if not engine:
+        return None
+    with engine.begin() as conn:
+        row = conn.execute(
+            text("SELECT id, email, name, role FROM app_users WHERE email = :email"),
+            {"email": normalize_email(email)},
+        ).first()
+    if not row:
+        return None
+    return {"id": int(row[0]), "email": row[1], "name": row[2], "role": row[3]}
+
+
+def get_current_user() -> dict | None:
+    user_id = session.get("user_id")
+    if not user_id:
+        return None
+    try:
+        return get_user_by_id(int(user_id))
+    except Exception:
+        return None
+
+
+def login_user(user: dict) -> None:
+    session["user_id"] = int(user["id"])
+
+
+def logout_user() -> None:
+    session.pop("user_id", None)
+
+
+def login_required(view):
+    @wraps(view)
+    def wrapped(*args, **kwargs):
+        if not get_current_user():
+            if request.path.startswith("/api"):
+                return jsonify({"error": "No autenticado"}), 401
+            return redirect(url_for("login"))
+        return view(*args, **kwargs)
+
+    return wrapped
+
+
 def get_state() -> dict:
     with lock:
-        return load_state()
+        user = get_current_user()
+        if not user:
+            return default_state()
+        return load_state_for_user(int(user["id"]))
 
 
 def update_state(mutator):
     with lock:
-        state = load_state()
+        user = get_current_user()
+        if not user:
+            return {"error": "No autenticado"}, 401
+        state = load_state_for_user(int(user["id"]))
         result = mutator(state)
-        save_state(state)
+        save_state_for_user(int(user["id"]), state)
         return result
 
 
@@ -176,16 +377,87 @@ def find_period(course: dict, period_id: str) -> dict | None:
 
 
 @app.route("/")
+@login_required
 def index():
-    return render_template("index.html")
+    return render_template("index.html", current_user=get_current_user())
+
+
+@app.route("/login")
+def login():
+    user = get_current_user()
+    if user:
+        return redirect(url_for("index"))
+    return render_template("login.html", google_enabled=google_oauth_enabled)
+
+
+@app.route("/auth/google")
+def auth_google():
+    if not google_oauth_enabled:
+        return "Google OAuth no configurado", 503
+    redirect_uri = url_for("auth_google_callback", _external=True)
+    return oauth.google.authorize_redirect(redirect_uri)
+
+
+@app.route("/auth/google/callback")
+def auth_google_callback():
+    if not google_oauth_enabled:
+        return "Google OAuth no configurado", 503
+    try:
+        token = oauth.google.authorize_access_token()
+        user_info = token.get("userinfo")
+        if not user_info:
+            resp = oauth.google.get("userinfo")
+            user_info = resp.json()
+    except Exception:
+        return "Error al autenticar con Google", 401
+
+    email = normalize_email(user_info.get("email", ""))
+    if not email:
+        return "No se pudo obtener email de Google", 401
+
+    user = get_user_by_email(email)
+    if not user:
+        return "Usuario no autorizado", 403
+
+    if engine:
+        with engine.begin() as conn:
+            conn.execute(
+                text(
+                    """
+                    UPDATE app_users
+                    SET google_sub = :google_sub, last_login = CURRENT_TIMESTAMP
+                    WHERE id = :id
+                    """
+                ),
+                {"id": user["id"], "google_sub": user_info.get("sub")},
+            )
+            _ensure_user_state_row(conn, int(user["id"]), default_state())
+
+    login_user(user)
+    return redirect(url_for("index"))
+
+
+@app.route("/logout")
+def logout():
+    logout_user()
+    return redirect(url_for("login"))
+
+
+@app.route("/api/me", methods=["GET"])
+@login_required
+def api_me():
+    user = get_current_user()
+    return jsonify({"id": user["id"], "email": user["email"], "name": user["name"], "role": user["role"]})
 
 
 @app.route("/api/state", methods=["GET"])
+@login_required
 def api_state():
     return jsonify(public_state(get_state()))
 
 
 @app.route("/api/course", methods=["POST"])
+@login_required
 def api_create_course():
     payload = request.get_json(force=True)
     name = (payload.get("name") or "").strip().upper()
@@ -205,6 +477,7 @@ def api_create_course():
 
 
 @app.route("/api/course/<course_name>", methods=["DELETE"])
+@login_required
 def api_delete_course(course_name: str):
     def mut(state):
         if course_name in state["courses"]:
@@ -215,6 +488,7 @@ def api_delete_course(course_name: str):
 
 
 @app.route("/api/course/<course_name>/student", methods=["POST"])
+@login_required
 def api_add_student(course_name: str):
     payload = request.get_json(force=True)
     student_name = (payload.get("name") or "").strip()
@@ -237,6 +511,7 @@ def api_add_student(course_name: str):
 
 
 @app.route("/api/course/<course_name>/student/<student_name>", methods=["DELETE"])
+@login_required
 def api_remove_student(course_name: str, student_name: str):
     def mut(state):
         course = find_course(state, course_name)
@@ -254,6 +529,7 @@ def api_remove_student(course_name: str, student_name: str):
 
 
 @app.route("/api/course/<course_name>/period", methods=["POST"])
+@login_required
 def api_add_period(course_name: str):
     payload = request.get_json(force=True)
     name = (payload.get("name") or "").strip()
@@ -282,6 +558,7 @@ def api_add_period(course_name: str):
 
 
 @app.route("/api/course/<course_name>/period/<period_id>", methods=["PUT"])
+@login_required
 def api_update_period(course_name: str, period_id: str):
     payload = request.get_json(force=True)
 
@@ -306,6 +583,7 @@ def api_update_period(course_name: str, period_id: str):
 
 
 @app.route("/api/course/<course_name>/period/<period_id>", methods=["DELETE"])
+@login_required
 def api_delete_period(course_name: str, period_id: str):
     def mut(state):
         course = find_course(state, course_name)
@@ -321,6 +599,7 @@ def api_delete_period(course_name: str, period_id: str):
 
 
 @app.route("/api/course/<course_name>/period/<period_id>/class", methods=["POST"])
+@login_required
 def api_add_class(course_name: str, period_id: str):
     payload = request.get_json(force=True)
     label = (payload.get("label") or "").strip() or "Clase"
@@ -342,6 +621,7 @@ def api_add_class(course_name: str, period_id: str):
 
 
 @app.route("/api/course/<course_name>/period/<period_id>/class/<int:class_idx>", methods=["PUT"])
+@login_required
 def api_update_class(course_name: str, period_id: str, class_idx: int):
     payload = request.get_json(force=True)
 
@@ -364,6 +644,7 @@ def api_update_class(course_name: str, period_id: str, class_idx: int):
 
 
 @app.route("/api/course/<course_name>/period/<period_id>/class/<int:class_idx>", methods=["DELETE"])
+@login_required
 def api_delete_class(course_name: str, period_id: str, class_idx: int):
     def mut(state):
         course = find_course(state, course_name)
@@ -388,6 +669,7 @@ def api_delete_class(course_name: str, period_id: str, class_idx: int):
 
 
 @app.route("/api/course/<course_name>/period/<period_id>/mark", methods=["POST"])
+@login_required
 def api_set_mark(course_name: str, period_id: str):
     payload = request.get_json(force=True)
     student_name = payload.get("student")
@@ -419,6 +701,7 @@ def api_set_mark(course_name: str, period_id: str):
 
 
 @app.route("/api/export/json", methods=["GET"])
+@login_required
 def api_export_json():
     state = get_state()
     payload = json.dumps(state, ensure_ascii=False, indent=2).encode("utf-8")
@@ -431,6 +714,7 @@ def api_export_json():
 
 
 @app.route("/api/import/json", methods=["POST"])
+@login_required
 def api_import_json():
     file = request.files.get("file")
     if not file:
@@ -449,6 +733,7 @@ def api_import_json():
 
 
 @app.route("/api/course/<course_name>/upload-excel", methods=["POST"])
+@login_required
 def api_upload_excel(course_name: str):
     file = request.files.get("file")
     if not file:
@@ -576,6 +861,7 @@ def _build_group_pdf(course_name: str, course: dict) -> bytes:
 
 
 @app.route("/api/course/<course_name>/report/individual.pdf", methods=["GET"])
+@login_required
 def api_pdf_individual(course_name: str):
     state = get_state()
     course = find_course(state, course_name)
@@ -592,6 +878,7 @@ def api_pdf_individual(course_name: str):
 
 
 @app.route("/api/course/<course_name>/report/group.pdf", methods=["GET"])
+@login_required
 def api_pdf_group(course_name: str):
     state = get_state()
     course = find_course(state, course_name)
@@ -609,7 +896,7 @@ def api_pdf_group(course_name: str):
 
 if __name__ == "__main__":
     if not engine and not DATA_FILE.exists():
-        save_state(default_state())
+        DATA_FILE.write_text(json.dumps(default_state(), ensure_ascii=False, indent=2), encoding="utf-8")
     port = int(os.getenv("PORT", "5000"))
     debug = os.getenv("FLASK_DEBUG", "0") == "1"
     app.run(host="0.0.0.0", port=port, debug=debug)
