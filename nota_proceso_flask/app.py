@@ -31,8 +31,14 @@ GOOGLE_DISCOVERY_URL = "https://accounts.google.com/.well-known/openid-configura
 
 ADMIN_EMAIL = (os.getenv("ADMIN_EMAIL") or "").strip().lower()
 ADMIN_NAME = (os.getenv("ADMIN_NAME") or "Administrador").strip()
-COLLAB_EMAIL = (os.getenv("COLLAB_EMAIL") or "").strip().lower()
-COLLAB_NAME = (os.getenv("COLLAB_NAME") or "Docente Colaborador").strip()
+
+# Soporta múltiples colaboradores separados por coma:
+#   COLLAB_EMAIL=correo1@gmail.com,correo2@gmail.com
+#   COLLAB_NAME=Nombre1,Nombre2   (opcional, misma cantidad y orden)
+_raw_collab_emails = (os.getenv("COLLAB_EMAIL") or "").strip()
+_raw_collab_names = (os.getenv("COLLAB_NAME") or "").strip()
+COLLAB_EMAILS: list[str] = [e.strip().lower() for e in _raw_collab_emails.split(",") if e.strip()]
+COLLAB_NAMES: list[str] = [n.strip() for n in _raw_collab_names.split(",") if n.strip()] if _raw_collab_names else []
 
 WEIGHTS = {"C": 1.0, "I": 0.5, "S": 0.0}
 
@@ -84,8 +90,9 @@ def _ensure_bootstrap_users(conn) -> None:
     users_to_create = []
     if ADMIN_EMAIL:
         users_to_create.append({"email": ADMIN_EMAIL, "name": ADMIN_NAME, "role": "admin"})
-    if COLLAB_EMAIL:
-        users_to_create.append({"email": COLLAB_EMAIL, "name": COLLAB_NAME, "role": "collaborator"})
+    for i, cemail in enumerate(COLLAB_EMAILS):
+        cname = COLLAB_NAMES[i] if i < len(COLLAB_NAMES) else f"Colaborador {i + 1}"
+        users_to_create.append({"email": cemail, "name": cname, "role": "collaborator"})
 
     for u in users_to_create:
         existing = conn.execute(
