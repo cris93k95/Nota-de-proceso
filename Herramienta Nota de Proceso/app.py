@@ -12,6 +12,7 @@ from statistics import mean
 
 from authlib.integrations.flask_client import OAuth
 from flask import Flask, jsonify, redirect, render_template, request, send_file, session, url_for
+from werkzeug.middleware.proxy_fix import ProxyFix
 from openpyxl import load_workbook
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4, landscape
@@ -43,6 +44,8 @@ COLLAB_NAMES: list[str] = [n.strip() for n in _raw_collab_names.split(",") if n.
 WEIGHTS = {"C": 1.0, "I": 0.5, "S": 0.0}
 
 app = Flask(__name__)
+app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
+
 app.secret_key = SECRET_KEY
 lock = threading.Lock()
 
