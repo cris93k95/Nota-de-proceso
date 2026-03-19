@@ -344,6 +344,29 @@ $("#importJsonInput").addEventListener("change", async (e) => {
   await loadState();
 });
 
+$("#bulkExcelInput").addEventListener("change", async (e) => {
+  const f = e.target.files?.[0];
+  if (!f) return;
+  if (!confirm("¿Cargar nómina desde Excel? Se crearán los cursos y estudiantes automáticamente.")) {
+    e.target.value = "";
+    return;
+  }
+  try {
+    const fd = new FormData();
+    fd.append("file", f);
+    const res = await api("/api/bulk-upload-excel", { method: "POST", body: fd });
+    let msg = `✅ Carga completada:\n• Cursos creados: ${res.courses_created}\n• Estudiantes agregados: ${res.students_added}\n\nDetalle:\n`;
+    (res.details || []).forEach((d) => {
+      msg += `  ${d.course}: ${d.created ? "NUEVO" : "existente"} — ${d.added} agregados (${d.total} total)\n`;
+    });
+    alert(msg);
+  } catch (err) {
+    alert("Error: " + err.message);
+  }
+  e.target.value = "";
+  await loadState();
+});
+
 loadState().catch((err) => {
   alert(err.message);
 });

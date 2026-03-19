@@ -729,15 +729,15 @@ def api_import_json():
     if not file:
         return jsonify({"error": "Archivo requerido"}), 400
     try:
-        state = json.loads(file.read().decode("utf-8"))
+        imported = json.loads(file.read().decode("utf-8"))
     except Exception:
         return jsonify({"error": "JSON inválido"}), 400
 
-    def mut(_):
-        return state
-
     with lock:
-        save_state(state)
+        user = get_current_user()
+        if not user:
+            return jsonify({"error": "No autenticado"}), 401
+        save_state_for_user(int(user["id"]), imported)
     return jsonify({"ok": True})
 
 
@@ -771,6 +771,85 @@ def api_upload_excel(course_name: str):
                 existing.add(n)
                 added += 1
         return {"ok": True, "added": added}
+
+    result = update_state(mut)
+    if isinstance(result, tuple):
+        return jsonify(result[0]), result[1]
+    return jsonify(result)
+
+
+import re as _re
+
+
+def _normalize_course_name(sheet_name: str) -> str:
+    """Convert sheet name like '1ºA 2026' or '1°A 2026' to '1A'."""
+    name = sheet_name.strip()
+    name = _re.sub(r"\s*\d{4}$", "", name)  # remove trailing year
+    name = name.replace("º", "").replace("°", "")
+    name = _re.sub(r"\s+", "", name)  # remove spaces
+    return name.upper()
+
+
+@app.route("/api/bulk-upload-excel", methods=["POST"])
+@login_required
+def api_bulk_upload_excel():
+    file = request.files.get("file")
+    if not file:
+        return jsonify({"error": "Archivo requerido"}), 400
+
+    try:
+        wb = load_workbook(filename=io.BytesIO(file.read()), data_only=True)
+    except Exception:
+        return jsonify({"error": "No se pudo leer el archivo Excel"}), 400
+
+    # Parse all sheets (skip RESUMEN)
+    courses_data: dict[str, list[str]] = {}
+    for sheet_name in wb.sheetnames:
+        if sheet_name.upper().strip() == "RESUMEN":
+            continue
+        ws = wb[sheet_name]
+        course_code = _normalize_course_name(sheet_name)
+        if not course_code:
+            continue
+        students: list[str] = []
+        for row in ws.iter_rows(min_row=5, max_col=5):
+            cell_a = row[0].value
+            if cell_a and isinstance(cell_a, str) and cell_a.strip().lower().startswith("observ"):
+                break
+            cell_e = row[4].value if len(row) > 4 else None
+            if cell_e is None:
+                continue
+            name = str(cell_e).strip()
+            if name:
+                students.append(name)
+        if students:
+            courses_data[course_code] = students
+
+    if not courses_data:
+        return jsonify({"error": "No se encontraron cursos/estudiantes en el archivo"}), 400
+
+    details: list[dict] = []
+
+    def mut(state):
+        total_created = 0
+        total_added = 0
+        for course_code, student_names in sorted(courses_data.items()):
+            created = False
+            if course_code not in state["courses"]:
+                state["courses"][course_code] = {"students": [], "periods": []}
+                created = True
+                total_created += 1
+            course = state["courses"][course_code]
+            existing = {s.get("name") for s in course.get("students", [])}
+            added = 0
+            for n in student_names:
+                if n not in existing:
+                    course["students"].append({"name": n, "active": True})
+                    existing.add(n)
+                    added += 1
+            total_added += added
+            details.append({"course": course_code, "created": created, "added": added, "total": len(course["students"])})
+        return {"ok": True, "courses_created": total_created, "students_added": total_added, "details": details}
 
     result = update_state(mut)
     if isinstance(result, tuple):
