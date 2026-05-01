@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>3°E — Electrónica - Prueba de Comprension Lectora TP</title>
+<style>
+    @page {
+        size: 21.59cm 27.94cm;
+        margin: 1.5cm 1.8cm 1.5cm 1.8cm;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 9pt;
+        line-height: 1.3;
+        color: #1a1a1a;
+        background: #f0f0f0;
+    }
+    .page {
+        background: white;
+        max-width: 21.59cm;
+        margin: 1cm auto;
+        padding: 0.5cm 1.8cm 1.5cm 1.8cm;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.12);
+    }
+    .logo-container img { width: 100%; display: block; margin-bottom: -4px; }
+    .test-title { text-align: center; font-size: 11pt; font-weight: bold; margin: 4px 0; }
+    .field-table, .criteria-box, .score-table { width: 100%; border-collapse: collapse; }
+    .field-table td, .criteria-box td, .score-table td, .score-table th { border: 1px solid #000; padding: 2px 5px; }
+    .label { background: #e8e8e8; font-weight: bold; }
+    .criteria-box { margin-bottom: 6px; font-size: 8pt; }
+    .part { margin-bottom: 8px; }
+    .part-header { background: #2962FF; color: white; padding: 3px 8px; font-weight: bold; font-size: 9pt; margin-bottom: 3px; }
+    .instructions { font-style: italic; font-size: 8pt; color: #333; margin-bottom: 4px; line-height: 1.35; }
+    .reading-text { background: #f5f5f5; border: 1px solid #ddd; padding: 6px 8px; margin-bottom: 6px; font-size: 8.5pt; line-height: 1.35; }
+    .text-title { font-weight: bold; font-size: 9pt; }
+    .question { margin-bottom: 4px; }
+    .q-text { font-weight: bold; font-size: 8.5pt; margin-bottom: 1px; }
+    .option { padding-left: 14px; font-size: 8pt; line-height: 1.35; }
+    .test-footer { text-align: center; font-style: italic; font-size: 7.5pt; color: #888; margin-top: 10px; padding-top: 6px; border-top: 1px solid #ddd; }
+    .answer-key { page-break-before: always; }
+    .answer-key-title { text-align: center; font-size: 10pt; font-weight: bold; margin-bottom: 6px; }
+    .answer-key-subtitle { text-align: center; font-size: 8.5pt; color: #555; margin-bottom: 8px; }
+    .answer-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 2px 12px; font-size: 8pt; }
+    .answer-item .ans-num { font-weight: bold; display: inline-block; min-width: 22px; }
+    .score-table { margin-top: 18px; font-size: 8pt; }
+    .score-table th { background: #e8e8e8; }
+    @media print {
+        body { background: white; }
+        .page { max-width: none; margin: 0; padding: 0; box-shadow: none; }
+        .part-header, .label { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    }
+</style>
+</head>
+<body>
+<div class="page">
+    <div class="logo-container"></div>
+    <div class="test-title">Prueba de Comprension Lectora - Ingles TP - 3°E — Electrónica</div>
+    <table class="field-table">
+        <tr><td class="label">Profesor:</td><td></td><td class="label">Nombre</td><td colspan="3"></td></tr>
+        <tr><td class="label">Asignatura:</td><td>Idioma Extranjero: Ingles</td><td class="label">Curso</td><td colspan="3">3°E ____</td></tr>
+        <tr><td class="label">Prueba N°</td><td>Nota 2 - Semestre 1</td><td class="label">N° Lista</td><td colspan="3"></td></tr>
+        <tr><td class="label">Semestre</td><td>1</td><td class="label">Puntos Obtenidos</td><td></td><td class="label">NOTA</td><td></td></tr>
+        <tr><td class="label">Fecha</td><td colspan="5">___/___/2026</td></tr>
+        <tr><td class="label">Visado por:</td><td colspan="5">EPM Gabriel S. Castro A</td></tr>
+        <tr><td class="label">Objetivo:</td><td colspan="5">Evaluar la comprensión de textos técnicos vinculados a circuitos, procedimientos de soldadura y seguridad electrónica.</td></tr>
+        <tr><td class="label">Habilidades</td><td colspan="5">Comprensión lectora — vocabulario técnico — interpretación de fichas y protocolos</td></tr>
+    </table>
+    <table class="criteria-box">
+        <tr>
+            <td class="label">Instrucciones:</td>
+            <td>
+                • Lee con atencion cada texto antes de responder.<br/>
+                • Cada respuesta correcta vale 2 puntos.<br/>
+                • Marca la alternativa correcta entre A, B, C o D.<br/>
+                • Puntaje total: 30 puntos. Exigencia: 60%.<br/>
+                • Tiempo sugerido: 60 minutos.<br/>
+                • No se permite el uso de diccionario ni celular.
+            </td>
+        </tr>
+    </table>
+    <div class="part">
+<div class="part-header">PART I — Circuit Troubleshooting (10 points)</div>
+<p class="instructions">Questions 1–5. Read the report and choose the best answer. Each correct answer is worth 2 points.</p>
+<div class="reading-text"><span class="text-title">Text 1 — Debugging a Microcontroller Circuit</span><br/>In the electronics lab, a team built a small circuit to make an LED blink with a microcontroller. When they uploaded the code, the LED stayed off. First, they checked the program, but the commands were correct. Then they used a multimeter and compared the circuit with the datasheet. They noticed that the resistor value was too high and that the ground cable was loose on the breadboard. After replacing the resistor and fixing the connection, the LED started blinking normally. The group learned that debugging requires both software review and careful inspection of the physical circuit.</div>
+<div class="question"><p class="q-text">1. What was the original problem with the circuit?</p><div class="option">A) The LED stayed off after the code was uploaded.</div><div class="option">B) The multimeter stopped working.</div><div class="option">C) The breadboard was missing completely.</div><div class="option">D) The keyboard could not type the program.</div></div>
+<div class="question"><p class="q-text">2. What did the students check first?</p><div class="option">A) The soldering station temperature.</div><div class="option">B) The program commands.</div><div class="option">C) The classroom lights.</div><div class="option">D) The air conditioner.</div></div>
+<div class="question"><p class="q-text">3. Which tools or documents helped them find the problem?</p><div class="option">A) A multimeter and the datasheet.</div><div class="option">B) A printer and a paint brush.</div><div class="option">C) A tyre gauge and a jack.</div><div class="option">D) A welding helmet and a ladder.</div></div>
+<div class="question"><p class="q-text">4. What two technical faults were discovered?</p><div class="option">A) A low battery and a broken monitor.</div><div class="option">B) A resistor value that was too high and a loose ground cable.</div><div class="option">C) A missing teacher and a noisy fan.</div><div class="option">D) An empty solder spool and a cracked table.</div></div>
+<div class="question"><p class="q-text">5. What lesson did the group learn at the end?</p><div class="option">A) Debugging only requires rewriting the code.</div><div class="option">B) Physical circuits never need inspection.</div><div class="option">C) Debugging needs software review and careful circuit inspection.</div><div class="option">D) LEDs should not be used with microcontrollers.</div></div>
+</div><div class="part">
+<div class="part-header">PART II — Workshop Procedure (10 points)</div>
+<p class="instructions">Questions 6–10. Read the procedure and identify the correct soldering sequence.</p>
+<div class="reading-text"><span class="text-title">Text 2 — Soldering a Header to a PCB</span><br/>Before soldering a header to a printed circuit board, the technician cleans the tip of the soldering iron and fixes the board in a small support. The pins are inserted into the correct holes, and the component is held in place. Then the pad and the pin are heated at the same time for a short moment. After that, solder is applied until a smooth, shiny joint appears. When the line of pins is finished, the technician inspects each joint and removes any solder bridge before powering the circuit.</div>
+<div class="question"><p class="q-text">6. What is cleaned before the soldering process starts?</p><div class="option">A) The monitor screen.</div><div class="option">B) The soldering iron tip.</div><div class="option">C) The power cable insulation.</div><div class="option">D) The keyboard battery.</div></div>
+<div class="question"><p class="q-text">7. Why is the board fixed in a support?</p><div class="option">A) To stop the classroom lights from moving.</div><div class="option">B) To hold the board steady during the task.</div><div class="option">C) To cool the solder faster.</div><div class="option">D) To replace the power supply.</div></div>
+<div class="question"><p class="q-text">8. What are heated at the same time before solder is added?</p><div class="option">A) The pad and the pin.</div><div class="option">B) The datasheet and the keyboard.</div><div class="option">C) The PCB box and the workbench.</div><div class="option">D) The switch and the multimeter screen.</div></div>
+<div class="question"><p class="q-text">9. How should a correct joint look according to the text?</p><div class="option">A) Dark and rough.</div><div class="option">B) Large and melted across two pads.</div><div class="option">C) Smooth and shiny.</div><div class="option">D) Hidden under the connector.</div></div>
+<div class="question"><p class="q-text">10. What must be removed before the circuit is powered?</p><div class="option">A) The component support.</div><div class="option">B) Any solder bridge.</div><div class="option">C) The board labels.</div><div class="option">D) The ground connection.</div></div>
+</div><div class="part">
+<div class="part-header">PART III — Lab Safety Notice (10 points)</div>
+<p class="instructions">Questions 11–15. Read the notice and identify the correct ESD precautions and the risk they prevent.</p>
+<div class="reading-text"><span class="text-title">Text 3 — Electrostatic Discharge Notice</span><br/>ESD NOTICE: Use the anti-static wrist strap whenever handling integrated circuits outside their protective bags. Keep component boxes closed when they are not in use. Do not place microchips directly on metal tables or plastic folders. If the wrist strap fails the tester, replace it before continuing the task. Return sensitive components to their labelled containers after each activity.</div>
+<div class="question"><p class="q-text">11. When must the anti-static wrist strap be used?</p><div class="option">A) Only while cleaning the floor.</div><div class="option">B) Whenever integrated circuits are handled outside their bags.</div><div class="option">C) Only after the class has finished.</div><div class="option">D) Only for mechanical repairs.</div></div>
+<div class="question"><p class="q-text">12. What should happen to component boxes when they are not being used?</p><div class="option">A) They should stay open all day.</div><div class="option">B) They should be closed.</div><div class="option">C) They should be placed on the floor.</div><div class="option">D) They should be washed with solvent.</div></div>
+<div class="question"><p class="q-text">13. Where should microchips not be placed?</p><div class="option">A) On a labelled foam tray.</div><div class="option">B) On metal tables or plastic folders.</div><div class="option">C) In protective bags.</div><div class="option">D) In closed component boxes.</div></div>
+<div class="question"><p class="q-text">14. What must happen if the wrist strap fails the tester?</p><div class="option">A) Continue the task quickly.</div><div class="option">B) Replace the strap before continuing.</div><div class="option">C) Remove all labels from the boxes.</div><div class="option">D) Power the circuit immediately.</div></div>
+<div class="question"><p class="q-text">15. What overall risk does this notice mainly try to reduce?</p><div class="option">A) Damage to components from electrostatic discharge and poor handling.</div><div class="option">B) Incorrect tyre pressure in the workshop.</div><div class="option">C) Overheating of the soldering iron tip.</div><div class="option">D) Colour mismatch in printed posters.</div></div>
+</div>
+    <div class="test-footer">- Fin de la evaluacion - Revisa tus respuestas antes de entregar. -</div>
+</div>
+
+<div class="page answer-key">
+    <div class="answer-key-title">Pauta de Respuestas Correctas</div>
+    <div class="answer-key-subtitle">Prueba de Comprension Lectora - 3°E — Electrónica</div>
+    <div class="answer-grid"><div class="answer-item"><span class="ans-num">1.</span> A</div><div class="answer-item"><span class="ans-num">2.</span> B</div><div class="answer-item"><span class="ans-num">3.</span> A</div><div class="answer-item"><span class="ans-num">4.</span> B</div><div class="answer-item"><span class="ans-num">5.</span> C</div><div class="answer-item"><span class="ans-num">6.</span> B</div><div class="answer-item"><span class="ans-num">7.</span> B</div><div class="answer-item"><span class="ans-num">8.</span> A</div><div class="answer-item"><span class="ans-num">9.</span> C</div><div class="answer-item"><span class="ans-num">10.</span> B</div><div class="answer-item"><span class="ans-num">11.</span> B</div><div class="answer-item"><span class="ans-num">12.</span> B</div><div class="answer-item"><span class="ans-num">13.</span> B</div><div class="answer-item"><span class="ans-num">14.</span> B</div><div class="answer-item"><span class="ans-num">15.</span> A</div></div>
+    <table class="score-table">
+        <tr><th colspan="6">Tabla de Conversion de Puntaje a Nota (60% de exigencia)</th></tr>
+        <tr><th>Puntaje</th><th>Nota</th><th>Puntaje</th><th>Nota</th><th>Puntaje</th><th>Nota</th></tr>
+        <tr><td>0</td><td>1.0</td><td>11</td><td>2.8</td><td>22</td><td style="background:#e8f5e9;">5.0</td></tr><tr><td>1</td><td>1.2</td><td>12</td><td>3.0</td><td>23</td><td style="background:#e8f5e9;">5.2</td></tr><tr><td>2</td><td>1.3</td><td>13</td><td>3.2</td><td>24</td><td style="background:#e8f5e9;">5.5</td></tr><tr><td>3</td><td>1.5</td><td>14</td><td>3.3</td><td>25</td><td style="background:#e8f5e9;">5.8</td></tr><tr><td>4</td><td>1.7</td><td>15</td><td>3.5</td><td>26</td><td style="background:#e8f5e9;">6.0</td></tr><tr><td>5</td><td>1.8</td><td>16</td><td>3.7</td><td>27</td><td style="background:#e8f5e9;">6.2</td></tr><tr><td>6</td><td>2.0</td><td>17</td><td>3.8</td><td>28</td><td style="background:#e8f5e9;">6.5</td></tr><tr><td>7</td><td>2.2</td><td>18</td><td style="background:#e8f5e9;">4.0</td><td>29</td><td style="background:#e8f5e9;">6.8</td></tr><tr><td>8</td><td>2.3</td><td>19</td><td style="background:#e8f5e9;">4.2</td><td>30</td><td style="background:#e8f5e9;">7.0</td></tr><tr><td>9</td><td>2.5</td><td>20</td><td style="background:#e8f5e9;">4.5</td><td></td><td></td></tr><tr><td>10</td><td>2.7</td><td>21</td><td style="background:#e8f5e9;">4.8</td><td></td><td></td></tr>
+    </table>
+</div>
+</body>
+</html>

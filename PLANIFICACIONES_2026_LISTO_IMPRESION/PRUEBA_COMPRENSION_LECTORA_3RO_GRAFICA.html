@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>3°D — Gráfica - Prueba de Comprension Lectora TP</title>
+<style>
+    @page {
+        size: 21.59cm 27.94cm;
+        margin: 1.5cm 1.8cm 1.5cm 1.8cm;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 9pt;
+        line-height: 1.3;
+        color: #1a1a1a;
+        background: #f0f0f0;
+    }
+    .page {
+        background: white;
+        max-width: 21.59cm;
+        margin: 1cm auto;
+        padding: 0.5cm 1.8cm 1.5cm 1.8cm;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.12);
+    }
+    .logo-container img { width: 100%; display: block; margin-bottom: -4px; }
+    .test-title { text-align: center; font-size: 11pt; font-weight: bold; margin: 4px 0; }
+    .field-table, .criteria-box, .score-table { width: 100%; border-collapse: collapse; }
+    .field-table td, .criteria-box td, .score-table td, .score-table th { border: 1px solid #000; padding: 2px 5px; }
+    .label { background: #e8e8e8; font-weight: bold; }
+    .criteria-box { margin-bottom: 6px; font-size: 8pt; }
+    .part { margin-bottom: 8px; }
+    .part-header { background: #2962FF; color: white; padding: 3px 8px; font-weight: bold; font-size: 9pt; margin-bottom: 3px; }
+    .instructions { font-style: italic; font-size: 8pt; color: #333; margin-bottom: 4px; line-height: 1.35; }
+    .reading-text { background: #f5f5f5; border: 1px solid #ddd; padding: 6px 8px; margin-bottom: 6px; font-size: 8.5pt; line-height: 1.35; }
+    .text-title { font-weight: bold; font-size: 9pt; }
+    .question { margin-bottom: 4px; }
+    .q-text { font-weight: bold; font-size: 8.5pt; margin-bottom: 1px; }
+    .option { padding-left: 14px; font-size: 8pt; line-height: 1.35; }
+    .test-footer { text-align: center; font-style: italic; font-size: 7.5pt; color: #888; margin-top: 10px; padding-top: 6px; border-top: 1px solid #ddd; }
+    .answer-key { page-break-before: always; }
+    .answer-key-title { text-align: center; font-size: 10pt; font-weight: bold; margin-bottom: 6px; }
+    .answer-key-subtitle { text-align: center; font-size: 8.5pt; color: #555; margin-bottom: 8px; }
+    .answer-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 2px 12px; font-size: 8pt; }
+    .answer-item .ans-num { font-weight: bold; display: inline-block; min-width: 22px; }
+    .score-table { margin-top: 18px; font-size: 8pt; }
+    .score-table th { background: #e8e8e8; }
+    @media print {
+        body { background: white; }
+        .page { max-width: none; margin: 0; padding: 0; box-shadow: none; }
+        .part-header, .label { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    }
+</style>
+</head>
+<body>
+<div class="page">
+    <div class="logo-container"></div>
+    <div class="test-title">Prueba de Comprension Lectora - Ingles TP - 3°D — Gráfica</div>
+    <table class="field-table">
+        <tr><td class="label">Profesor:</td><td></td><td class="label">Nombre</td><td colspan="3"></td></tr>
+        <tr><td class="label">Asignatura:</td><td>Idioma Extranjero: Ingles</td><td class="label">Curso</td><td colspan="3">3°D ____</td></tr>
+        <tr><td class="label">Prueba N°</td><td>Nota 2 - Semestre 1</td><td class="label">N° Lista</td><td colspan="3"></td></tr>
+        <tr><td class="label">Semestre</td><td>1</td><td class="label">Puntos Obtenidos</td><td></td><td class="label">NOTA</td><td></td></tr>
+        <tr><td class="label">Fecha</td><td colspan="5">___/___/2026</td></tr>
+        <tr><td class="label">Visado por:</td><td colspan="5">EPM Gabriel S. Castro A</td></tr>
+        <tr><td class="label">Objetivo:</td><td colspan="5">Evaluar la comprensión de textos técnicos vinculados a preprensa, impresión y protocolos de seguridad en Gráfica.</td></tr>
+        <tr><td class="label">Habilidades</td><td colspan="5">Comprensión lectora — vocabulario técnico — interpretación de procesos de impresión</td></tr>
+    </table>
+    <table class="criteria-box">
+        <tr>
+            <td class="label">Instrucciones:</td>
+            <td>
+                • Lee con atencion cada texto antes de responder.<br/>
+                • Cada respuesta correcta vale 2 puntos.<br/>
+                • Marca la alternativa correcta entre A, B, C o D.<br/>
+                • Puntaje total: 30 puntos. Exigencia: 60%.<br/>
+                • Tiempo sugerido: 60 minutos.<br/>
+                • No se permite el uso de diccionario ni celular.
+            </td>
+        </tr>
+    </table>
+    <div class="part">
+<div class="part-header">PART I — Prepress Case (10 points)</div>
+<p class="instructions">Questions 1–5. Read the case and choose the best answer. Each correct answer is worth 2 points.</p>
+<div class="reading-text"><span class="text-title">Text 1 — Colour Mismatch in a Poster Run</span><br/>A graphic design group prepared a poster for a school campaign, but the printed result looked darker than the digital proof on screen. To solve the problem, the students compared the CMYK profile, the paper type, and the printer settings. They discovered that the file had been exported with the wrong colour profile and that the monitor had not been calibrated recently. After correcting the profile and printing a new proof, the images looked closer to the expected colours. The teacher used the case to explain that professional printing depends on careful prepress decisions, not only on creative ideas.</div>
+<div class="question"><p class="q-text">1. What problem appeared in the first print?</p><div class="option">A) The poster was brighter than expected.</div><div class="option">B) The poster looked darker than the digital proof.</div><div class="option">C) The printer stopped because of a broken wheel.</div><div class="option">D) The paper was too small for the design.</div></div>
+<div class="question"><p class="q-text">2. Which technical elements did the students compare?</p><div class="option">A) The CMYK profile, paper type, and printer settings.</div><div class="option">B) The classroom schedule and student list.</div><div class="option">C) The website password and USB cable.</div><div class="option">D) The wall colour and poster frame.</div></div>
+<div class="question"><p class="q-text">3. What error was found in the exported file?</p><div class="option">A) It had no title on the first page.</div><div class="option">B) It used the wrong colour profile.</div><div class="option">C) It was saved as an audio file.</div><div class="option">D) It contained no images at all.</div></div>
+<div class="question"><p class="q-text">4. What happened after the profile was corrected?</p><div class="option">A) The new proof looked closer to the expected colours.</div><div class="option">B) The printer produced only black pages.</div><div class="option">C) The campaign had to be cancelled.</div><div class="option">D) The monitor stopped showing any image.</div></div>
+<div class="question"><p class="q-text">5. What professional lesson does the teacher highlight?</p><div class="option">A) Creative ideas are the only important part of printing.</div><div class="option">B) Professional printing depends on careful prepress decisions.</div><div class="option">C) Paper type never affects colour results.</div><div class="option">D) Colour profiles are not used in graphic design.</div></div>
+</div><div class="part">
+<div class="part-header">PART II — Export Procedure (10 points)</div>
+<p class="instructions">Questions 6–10. Read the procedure and identify the correct prepress sequence.</p>
+<div class="reading-text"><span class="text-title">Text 2 — PDF for Print Export Checklist</span><br/>Before sending a poster to print, the operator runs a preflight check on the file. First, the bleed is confirmed on all sides and crop marks are activated. Next, the images are reviewed to make sure they have enough resolution for printing. The fonts are embedded, and the colours are converted to CMYK when necessary. After that, the operator exports the PDF and prints a small proof to check margins, colour balance, and text readability. Only after that proof is approved does the file go to final production.</div>
+<div class="question"><p class="q-text">6. What is checked first in the export process?</p><div class="option">A) The classroom attendance.</div><div class="option">B) The bleed and crop marks.</div><div class="option">C) The air temperature in the room.</div><div class="option">D) The printer wheels.</div></div>
+<div class="question"><p class="q-text">7. Why are the images reviewed before export?</p><div class="option">A) To confirm that they have enough resolution for printing.</div><div class="option">B) To turn them into handwritten sketches.</div><div class="option">C) To remove every colour from the design.</div><div class="option">D) To convert them into spreadsheets.</div></div>
+<div class="question"><p class="q-text">8. What happens to the fonts in the file?</p><div class="option">A) They are erased before export.</div><div class="option">B) They are embedded.</div><div class="option">C) They are replaced with random symbols.</div><div class="option">D) They are printed by hand.</div></div>
+<div class="question"><p class="q-text">9. Why is a small proof printed after export?</p><div class="option">A) To check margins, colour balance, and readability.</div><div class="option">B) To make the final production slower.</div><div class="option">C) To delete the crop marks automatically.</div><div class="option">D) To avoid using CMYK colours.</div></div>
+<div class="question"><p class="q-text">10. When is the file sent to final production?</p><div class="option">A) Before any proof is printed.</div><div class="option">B) Only after the proof is approved.</div><div class="option">C) As soon as the bleed is ignored.</div><div class="option">D) After the fonts are removed.</div></div>
+</div><div class="part">
+<div class="part-header">PART III — Print Room Notice (10 points)</div>
+<p class="instructions">Questions 11–15. Read the notice and identify the correct safety and cleaning instructions, including its main purpose.</p>
+<div class="reading-text"><span class="text-title">Text 3 — Roller Cleaning Notice</span><br/>PRINT ROOM NOTICE: Use gloves and ventilation when cleaning ink rollers with solvent. Keep open containers away from heat sources and close them immediately after use. Store wiping cloths in the metal container marked for chemical waste. If a spill reaches the floor, block the area and report it before starting another task. Wash your hands before touching paper, proofs, or the keyboard.</div>
+<div class="question"><p class="q-text">11. What should be used when cleaning rollers with solvent?</p><div class="option">A) Gloves and ventilation.</div><div class="option">B) Water and sand only.</div><div class="option">C) Bare hands and a fan turned off.</div><div class="option">D) Brake fluid and paper towels.</div></div>
+<div class="question"><p class="q-text">12. Where must open solvent containers be kept away from?</p><div class="option">A) The paper cutter only.</div><div class="option">B) Heat sources.</div><div class="option">C) The keyboard only.</div><div class="option">D) Crop marks only.</div></div>
+<div class="question"><p class="q-text">13. Where should wiping cloths be stored after use?</p><div class="option">A) Inside a student backpack.</div><div class="option">B) In the metal container for chemical waste.</div><div class="option">C) Under the printer.</div><div class="option">D) On the nearest table.</div></div>
+<div class="question"><p class="q-text">14. What should happen if a spill reaches the floor?</p><div class="option">A) Start another task immediately.</div><div class="option">B) Ignore it if the floor is already dark.</div><div class="option">C) Block the area and report the spill.</div><div class="option">D) Print a proof over the spill.</div></div>
+<div class="question"><p class="q-text">15. What is the main purpose of this notice in the print room?</p><div class="option">A) To prevent chemical accidents and contamination during cleaning.</div><div class="option">B) To speed up poster export and proof approval.</div><div class="option">C) To reduce the number of keyboards in the room.</div><div class="option">D) To replace all solvent with water.</div></div>
+</div>
+    <div class="test-footer">- Fin de la evaluacion - Revisa tus respuestas antes de entregar. -</div>
+</div>
+
+<div class="page answer-key">
+    <div class="answer-key-title">Pauta de Respuestas Correctas</div>
+    <div class="answer-key-subtitle">Prueba de Comprension Lectora - 3°D — Gráfica</div>
+    <div class="answer-grid"><div class="answer-item"><span class="ans-num">1.</span> B</div><div class="answer-item"><span class="ans-num">2.</span> A</div><div class="answer-item"><span class="ans-num">3.</span> B</div><div class="answer-item"><span class="ans-num">4.</span> A</div><div class="answer-item"><span class="ans-num">5.</span> B</div><div class="answer-item"><span class="ans-num">6.</span> B</div><div class="answer-item"><span class="ans-num">7.</span> A</div><div class="answer-item"><span class="ans-num">8.</span> B</div><div class="answer-item"><span class="ans-num">9.</span> A</div><div class="answer-item"><span class="ans-num">10.</span> B</div><div class="answer-item"><span class="ans-num">11.</span> A</div><div class="answer-item"><span class="ans-num">12.</span> B</div><div class="answer-item"><span class="ans-num">13.</span> B</div><div class="answer-item"><span class="ans-num">14.</span> C</div><div class="answer-item"><span class="ans-num">15.</span> A</div></div>
+    <table class="score-table">
+        <tr><th colspan="6">Tabla de Conversion de Puntaje a Nota (60% de exigencia)</th></tr>
+        <tr><th>Puntaje</th><th>Nota</th><th>Puntaje</th><th>Nota</th><th>Puntaje</th><th>Nota</th></tr>
+        <tr><td>0</td><td>1.0</td><td>11</td><td>2.8</td><td>22</td><td style="background:#e8f5e9;">5.0</td></tr><tr><td>1</td><td>1.2</td><td>12</td><td>3.0</td><td>23</td><td style="background:#e8f5e9;">5.2</td></tr><tr><td>2</td><td>1.3</td><td>13</td><td>3.2</td><td>24</td><td style="background:#e8f5e9;">5.5</td></tr><tr><td>3</td><td>1.5</td><td>14</td><td>3.3</td><td>25</td><td style="background:#e8f5e9;">5.8</td></tr><tr><td>4</td><td>1.7</td><td>15</td><td>3.5</td><td>26</td><td style="background:#e8f5e9;">6.0</td></tr><tr><td>5</td><td>1.8</td><td>16</td><td>3.7</td><td>27</td><td style="background:#e8f5e9;">6.2</td></tr><tr><td>6</td><td>2.0</td><td>17</td><td>3.8</td><td>28</td><td style="background:#e8f5e9;">6.5</td></tr><tr><td>7</td><td>2.2</td><td>18</td><td style="background:#e8f5e9;">4.0</td><td>29</td><td style="background:#e8f5e9;">6.8</td></tr><tr><td>8</td><td>2.3</td><td>19</td><td style="background:#e8f5e9;">4.2</td><td>30</td><td style="background:#e8f5e9;">7.0</td></tr><tr><td>9</td><td>2.5</td><td>20</td><td style="background:#e8f5e9;">4.5</td><td></td><td></td></tr><tr><td>10</td><td>2.7</td><td>21</td><td style="background:#e8f5e9;">4.8</td><td></td><td></td></tr>
+    </table>
+</div>
+</body>
+</html>

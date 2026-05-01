@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>3°A — Mecánica Industrial - Prueba de Comprension Lectora TP</title>
+<style>
+    @page {
+        size: 21.59cm 27.94cm;
+        margin: 1.5cm 1.8cm 1.5cm 1.8cm;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 9pt;
+        line-height: 1.3;
+        color: #1a1a1a;
+        background: #f0f0f0;
+    }
+    .page {
+        background: white;
+        max-width: 21.59cm;
+        margin: 1cm auto;
+        padding: 0.5cm 1.8cm 1.5cm 1.8cm;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.12);
+    }
+    .logo-container img { width: 100%; display: block; margin-bottom: -4px; }
+    .test-title { text-align: center; font-size: 11pt; font-weight: bold; margin: 4px 0; }
+    .field-table, .criteria-box, .score-table { width: 100%; border-collapse: collapse; }
+    .field-table td, .criteria-box td, .score-table td, .score-table th { border: 1px solid #000; padding: 2px 5px; }
+    .label { background: #e8e8e8; font-weight: bold; }
+    .criteria-box { margin-bottom: 6px; font-size: 8pt; }
+    .part { margin-bottom: 8px; }
+    .part-header { background: #2962FF; color: white; padding: 3px 8px; font-weight: bold; font-size: 9pt; margin-bottom: 3px; }
+    .instructions { font-style: italic; font-size: 8pt; color: #333; margin-bottom: 4px; line-height: 1.35; }
+    .reading-text { background: #f5f5f5; border: 1px solid #ddd; padding: 6px 8px; margin-bottom: 6px; font-size: 8.5pt; line-height: 1.35; }
+    .text-title { font-weight: bold; font-size: 9pt; }
+    .question { margin-bottom: 4px; }
+    .q-text { font-weight: bold; font-size: 8.5pt; margin-bottom: 1px; }
+    .option { padding-left: 14px; font-size: 8pt; line-height: 1.35; }
+    .test-footer { text-align: center; font-style: italic; font-size: 7.5pt; color: #888; margin-top: 10px; padding-top: 6px; border-top: 1px solid #ddd; }
+    .answer-key { page-break-before: always; }
+    .answer-key-title { text-align: center; font-size: 10pt; font-weight: bold; margin-bottom: 6px; }
+    .answer-key-subtitle { text-align: center; font-size: 8.5pt; color: #555; margin-bottom: 8px; }
+    .answer-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 2px 12px; font-size: 8pt; }
+    .answer-item .ans-num { font-weight: bold; display: inline-block; min-width: 22px; }
+    .score-table { margin-top: 18px; font-size: 8pt; }
+    .score-table th { background: #e8e8e8; }
+    @media print {
+        body { background: white; }
+        .page { max-width: none; margin: 0; padding: 0; box-shadow: none; }
+        .part-header, .label { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    }
+</style>
+</head>
+<body>
+<div class="page">
+    <div class="logo-container"></div>
+    <div class="test-title">Prueba de Comprension Lectora - Ingles TP - 3°A — Mecánica Industrial</div>
+    <table class="field-table">
+        <tr><td class="label">Profesor:</td><td></td><td class="label">Nombre</td><td colspan="3"></td></tr>
+        <tr><td class="label">Asignatura:</td><td>Idioma Extranjero: Ingles</td><td class="label">Curso</td><td colspan="3">3°A ____</td></tr>
+        <tr><td class="label">Prueba N°</td><td>Nota 2 - Semestre 1</td><td class="label">N° Lista</td><td colspan="3"></td></tr>
+        <tr><td class="label">Semestre</td><td>1</td><td class="label">Puntos Obtenidos</td><td></td><td class="label">NOTA</td><td></td></tr>
+        <tr><td class="label">Fecha</td><td colspan="5">___/___/2026</td></tr>
+        <tr><td class="label">Visado por:</td><td colspan="5">EPM Gabriel S. Castro A</td></tr>
+        <tr><td class="label">Objetivo:</td><td colspan="5">Evaluar la comprensión de textos técnicos vinculados a procesos productivos, mantenimiento y seguridad en Mecánica Industrial.</td></tr>
+        <tr><td class="label">Habilidades</td><td colspan="5">Comprensión lectora — vocabulario técnico — interpretación de procedimientos</td></tr>
+    </table>
+    <table class="criteria-box">
+        <tr>
+            <td class="label">Instrucciones:</td>
+            <td>
+                • Lee con atencion cada texto antes de responder.<br/>
+                • Cada respuesta correcta vale 2 puntos.<br/>
+                • Marca la alternativa correcta entre A, B, C o D.<br/>
+                • Puntaje total: 30 puntos. Exigencia: 60%.<br/>
+                • Tiempo sugerido: 60 minutos.<br/>
+                • No se permite el uso de diccionario ni celular.
+            </td>
+        </tr>
+    </table>
+    <div class="part">
+<div class="part-header">PART I — Predictive Maintenance (10 points)</div>
+<p class="instructions">Questions 1–5. Read the text and choose the correct answer. Each correct answer is worth 2 points.</p>
+<div class="reading-text"><span class="text-title">Text 1 — Predictive Maintenance in a Packaging Plant</span><br/>At a packaging plant in Rancagua, the industrial maintenance team noticed that one conveyor motor was stopping for a few minutes every afternoon. Instead of waiting for the motor to fail, the technicians checked the vibration sensor and the temperature record stored in the control panel. The data showed that the motor was getting hotter after long production runs. The team cleaned the ventilation grid, adjusted the belt tension, and scheduled a short maintenance stop before the next shift. After that intervention, the conveyor worked more smoothly and the line lost less time. The supervisor explained that predictive maintenance is useful because it solves small problems before they become expensive breakdowns.</div>
+<div class="question"><p class="q-text">1. What problem did the team detect at the beginning of the text?</p><div class="option">A) The control panel stopped working completely.</div><div class="option">B) The conveyor motor stopped for short periods every afternoon.</div><div class="option">C) The packaging line had no vibration sensor installed.</div><div class="option">D) The supervisor could not read the maintenance report.</div></div>
+<div class="question"><p class="q-text">2. Which sources of information did the technicians review?</p><div class="option">A) The production budget and the operator schedule.</div><div class="option">B) The conveyor manual and the shift calendar.</div><div class="option">C) The vibration sensor and the temperature record.</div><div class="option">D) The belt invoice and the emergency log.</div></div>
+<div class="question"><p class="q-text">3. Why did the team clean the ventilation grid and adjust the belt tension?</p><div class="option">A) Because the data showed the motor was overheating after long runs.</div><div class="option">B) Because a new motor arrived from the supplier.</div><div class="option">C) Because the supervisor wanted to change the whole line.</div><div class="option">D) Because the conveyor was too noisy in the morning only.</div></div>
+<div class="question"><p class="q-text">4. What happened after the intervention?</p><div class="option">A) The line had to stop for a full day.</div><div class="option">B) The motor needed to be replaced immediately.</div><div class="option">C) The conveyor ran more smoothly and the line lost less time.</div><div class="option">D) The team removed the vibration sensor from the plant.</div></div>
+<div class="question"><p class="q-text">5. What idea does the supervisor emphasize?</p><div class="option">A) Predictive maintenance avoids reading technical data.</div><div class="option">B) Predictive maintenance helps solve small issues before they become costly failures.</div><div class="option">C) Predictive maintenance is only useful during night shifts.</div><div class="option">D) Predictive maintenance replaces all manual inspection.</div></div>
+</div><div class="part">
+<div class="part-header">PART II — Procedure Sheet (10 points)</div>
+<p class="instructions">Questions 6–10. Read the workshop procedure carefully and identify the key technical details.</p>
+<div class="reading-text"><span class="text-title">Text 2 — Shaft Alignment Procedure</span><br/>Before aligning a motor and a pump, the students in the workshop read the procedure sheet carefully. First, they disconnect the electrical supply and place a lockout tag on the panel. Next, they clean the coupling surfaces and install the dial indicator. Then they rotate the shaft slowly and record the measurements at four positions. If the readings show a difference, the team adds or removes thin metal shims under the motor base. Finally, they tighten the bolts again and repeat the measurements to confirm the alignment. The teacher reminds them that a dirty surface or a missing measurement can produce vibration and damage the machine.</div>
+<div class="question"><p class="q-text">6. What is the first action in the alignment procedure?</p><div class="option">A) Rotate the shaft and record four measurements.</div><div class="option">B) Tighten the bolts and test the pump.</div><div class="option">C) Disconnect the electrical supply and place a lockout tag.</div><div class="option">D) Install the new coupling on the machine.</div></div>
+<div class="question"><p class="q-text">7. Which tool is installed to check the shaft position?</p><div class="option">A) A wrench.</div><div class="option">B) A dial indicator.</div><div class="option">C) A soldering iron.</div><div class="option">D) A hydraulic jack.</div></div>
+<div class="question"><p class="q-text">8. Why are shims added or removed under the motor base?</p><div class="option">A) To change the pump speed during production.</div><div class="option">B) To correct the difference shown in the measurements.</div><div class="option">C) To clean the shaft before testing.</div><div class="option">D) To lock the electrical panel more securely.</div></div>
+<div class="question"><p class="q-text">9. What do the students do after tightening the bolts again?</p><div class="option">A) They repeat the measurements to confirm alignment.</div><div class="option">B) They remove the dial indicator permanently.</div><div class="option">C) They start the machine without supervision.</div><div class="option">D) They paint the motor base blue.</div></div>
+<div class="question"><p class="q-text">10. According to the teacher, what can happen if the surface is dirty or a measurement is missing?</p><div class="option">A) The panel will show a battery warning light.</div><div class="option">B) The workshop will lose the procedure sheet.</div><div class="option">C) Vibration can appear and damage the machine.</div><div class="option">D) The pump will produce colder water.</div></div>
+</div><div class="part">
+<div class="part-header">PART III — Safety Notice (10 points)</div>
+<p class="instructions">Questions 11–15. Read the safety notice and identify precautions, responsibilities, and the main risk being prevented.</p>
+<div class="reading-text"><span class="text-title">Text 3 — Workshop Safety Notice</span><br/>NOTICE: When moving a heavy motor housing, inspect the lifting slings before use. Keep the load low while transporting it across the workshop. Only the assigned spotter may give hand signals to the operator. If oil is found on the floor, stop the movement and clean the area before continuing. Never place your hands under the suspended load, even for a moment.</div>
+<div class="question"><p class="q-text">11. What must be inspected before moving the load?</p><div class="option">A) The work uniforms.</div><div class="option">B) The lifting slings.</div><div class="option">C) The classroom projector.</div><div class="option">D) The maintenance calendar.</div></div>
+<div class="question"><p class="q-text">12. How should the load be transported across the workshop?</p><div class="option">A) As high as possible to avoid obstacles.</div><div class="option">B) With two operators pulling from both sides.</div><div class="option">C) Low to the ground while it is being moved.</div><div class="option">D) Only after the motor is disassembled.</div></div>
+<div class="question"><p class="q-text">13. Who is allowed to give hand signals to the operator?</p><div class="option">A) Any student near the machine.</div><div class="option">B) The assigned spotter only.</div><div class="option">C) The person cleaning the floor.</div><div class="option">D) The last student who used the crane.</div></div>
+<div class="question"><p class="q-text">14. What must happen if oil is found on the floor?</p><div class="option">A) The load should move faster to avoid delay.</div><div class="option">B) The spotter should change places with the operator.</div><div class="option">C) The movement must stop and the area must be cleaned.</div><div class="option">D) The slings should be replaced immediately.</div></div>
+<div class="question"><p class="q-text">15. What is the main safety purpose of this notice?</p><div class="option">A) To explain how to paint the workshop floor.</div><div class="option">B) To prevent crush injuries while moving suspended loads.</div><div class="option">C) To schedule predictive maintenance after each shift.</div><div class="option">D) To reduce the price of replacement motors.</div></div>
+</div>
+    <div class="test-footer">- Fin de la evaluacion - Revisa tus respuestas antes de entregar. -</div>
+</div>
+
+<div class="page answer-key">
+    <div class="answer-key-title">Pauta de Respuestas Correctas</div>
+    <div class="answer-key-subtitle">Prueba de Comprension Lectora - 3°A — Mecánica Industrial</div>
+    <div class="answer-grid"><div class="answer-item"><span class="ans-num">1.</span> B</div><div class="answer-item"><span class="ans-num">2.</span> C</div><div class="answer-item"><span class="ans-num">3.</span> A</div><div class="answer-item"><span class="ans-num">4.</span> C</div><div class="answer-item"><span class="ans-num">5.</span> B</div><div class="answer-item"><span class="ans-num">6.</span> C</div><div class="answer-item"><span class="ans-num">7.</span> B</div><div class="answer-item"><span class="ans-num">8.</span> B</div><div class="answer-item"><span class="ans-num">9.</span> A</div><div class="answer-item"><span class="ans-num">10.</span> C</div><div class="answer-item"><span class="ans-num">11.</span> B</div><div class="answer-item"><span class="ans-num">12.</span> C</div><div class="answer-item"><span class="ans-num">13.</span> B</div><div class="answer-item"><span class="ans-num">14.</span> C</div><div class="answer-item"><span class="ans-num">15.</span> B</div></div>
+    <table class="score-table">
+        <tr><th colspan="6">Tabla de Conversion de Puntaje a Nota (60% de exigencia)</th></tr>
+        <tr><th>Puntaje</th><th>Nota</th><th>Puntaje</th><th>Nota</th><th>Puntaje</th><th>Nota</th></tr>
+        <tr><td>0</td><td>1.0</td><td>11</td><td>2.8</td><td>22</td><td style="background:#e8f5e9;">5.0</td></tr><tr><td>1</td><td>1.2</td><td>12</td><td>3.0</td><td>23</td><td style="background:#e8f5e9;">5.2</td></tr><tr><td>2</td><td>1.3</td><td>13</td><td>3.2</td><td>24</td><td style="background:#e8f5e9;">5.5</td></tr><tr><td>3</td><td>1.5</td><td>14</td><td>3.3</td><td>25</td><td style="background:#e8f5e9;">5.8</td></tr><tr><td>4</td><td>1.7</td><td>15</td><td>3.5</td><td>26</td><td style="background:#e8f5e9;">6.0</td></tr><tr><td>5</td><td>1.8</td><td>16</td><td>3.7</td><td>27</td><td style="background:#e8f5e9;">6.2</td></tr><tr><td>6</td><td>2.0</td><td>17</td><td>3.8</td><td>28</td><td style="background:#e8f5e9;">6.5</td></tr><tr><td>7</td><td>2.2</td><td>18</td><td style="background:#e8f5e9;">4.0</td><td>29</td><td style="background:#e8f5e9;">6.8</td></tr><tr><td>8</td><td>2.3</td><td>19</td><td style="background:#e8f5e9;">4.2</td><td>30</td><td style="background:#e8f5e9;">7.0</td></tr><tr><td>9</td><td>2.5</td><td>20</td><td style="background:#e8f5e9;">4.5</td><td></td><td></td></tr><tr><td>10</td><td>2.7</td><td>21</td><td style="background:#e8f5e9;">4.8</td><td></td><td></td></tr>
+    </table>
+</div>
+</body>
+</html>
