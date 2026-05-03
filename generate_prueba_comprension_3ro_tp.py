@@ -16,10 +16,21 @@ PLAN_OUTPUT_DIR = ROOT / "PLANIFICACIONES_2026_LISTO_IMPRESION"
 SOURCE_INSTRUMENTS_DIR = ROOT / "materiales-clases" / "3ro-medio" / "instrumentos"
 PUBLISHED_INSTRUMENTS_DIR = ROOT / "tranquiprofe.cl" / "static" / "recursos" / "materiales" / "3ro-medio" / "instrumentos"
 TARGET_DIRS = [SOURCE_INSTRUMENTS_DIR, PUBLISHED_INSTRUMENTS_DIR]
-LOGO_PATH = ROOT / "_logo_header_resized.png"
+LOGO_PATH = next(
+    (path for path in (ROOT / "_logo_header_resized.png", ROOT / "Logo Colegio.png") if path.exists()),
+    ROOT / "_logo_header_resized.png",
+)
 LOGO_B64 = base64.b64encode(LOGO_PATH.read_bytes()).decode("ascii") if LOGO_PATH.exists() else ""
 TOTAL_POINTS = 30
 PASSING_POINTS = int(TOTAL_POINTS * 0.6)
+GENERAL_INSTRUCTIONS = [
+    "Lee con atencion cada texto antes de responder.",
+    "Cada respuesta correcta vale 2 puntos.",
+    "Marca la alternativa correcta entre A, B, C o D.",
+    f"La prueba tiene {TOTAL_POINTS} puntos en total y una exigencia de 60%.",
+    "Tienes 60 minutos para completar la prueba.",
+    "No se permite el uso de diccionario ni celular.",
+]
 
 
 COURSE_ASSESSMENTS = [
@@ -1111,6 +1122,16 @@ def set_cell_shading(cell, color):
     cell_properties.append(shading)
 
 
+def summary_items(assessment):
+    return [
+        ("Asignatura", "Idioma Extranjero: Ingles"),
+        ("Curso", assessment["course"]),
+        ("Evaluacion", "Nota 2 - Semestre 1"),
+        ("Puntaje total", f"{TOTAL_POINTS} puntos"),
+        ("Exigencia", "60%"),
+    ]
+
+
 def add_part_header(document, text):
     paragraph = document.add_paragraph()
     paragraph.paragraph_format.space_before = Pt(6)
@@ -1132,6 +1153,82 @@ def add_instruction_line(document, text):
     run.italic = True
     run.font.size = Pt(8)
     run.font.color.rgb = RGBColor(0x33, 0x33, 0x33)
+
+
+def add_header_panel(document, assessment):
+    if LOGO_PATH.exists():
+        paragraph = document.add_paragraph()
+        paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        paragraph.add_run().add_picture(str(LOGO_PATH), width=Cm(17.99))
+
+    title = document.add_paragraph()
+    title.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    title.paragraph_format.space_before = Pt(4)
+    title.paragraph_format.space_after = Pt(3)
+    title_run = title.add_run(f"Prueba de Comprension Lectora - Ingles TP - {assessment['course']}")
+    title_run.bold = True
+    title_run.font.size = Pt(11)
+
+    summary = document.add_paragraph()
+    summary.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    summary.paragraph_format.space_before = Pt(1)
+    summary.paragraph_format.space_after = Pt(3)
+    for index, (label, value) in enumerate(summary_items(assessment)):
+        if index:
+            separator = summary.add_run("   ")
+            separator.font.size = Pt(8.2)
+        label_run = summary.add_run(f"{label}: ")
+        label_run.bold = True
+        label_run.font.size = Pt(8.2)
+        value_run = summary.add_run(str(value))
+        value_run.font.size = Pt(8.2)
+
+    student_line = document.add_paragraph()
+    student_line.paragraph_format.space_before = Pt(1)
+    student_line.paragraph_format.space_after = Pt(3)
+    for label, value in (
+        ("Nombre:", " ________________________________"),
+        ("   Curso:", " __________"),
+        ("   Fecha:", " ___/___/2026"),
+    ):
+        label_run = student_line.add_run(label)
+        label_run.bold = True
+        label_run.font.size = Pt(8.2)
+        value_run = student_line.add_run(value)
+        value_run.font.size = Pt(8.2)
+
+    objective = document.add_paragraph()
+    objective.paragraph_format.space_before = Pt(1)
+    objective.paragraph_format.space_after = Pt(1)
+    objective_label = objective.add_run("Objetivo: ")
+    objective_label.bold = True
+    objective_label.font.size = Pt(8)
+    objective_text = objective.add_run(assessment["objective"])
+    objective_text.font.size = Pt(8)
+
+    skills = document.add_paragraph()
+    skills.paragraph_format.space_before = Pt(0)
+    skills.paragraph_format.space_after = Pt(3)
+    skills_label = skills.add_run("Habilidades: ")
+    skills_label.bold = True
+    skills_label.font.size = Pt(8)
+    skills_text = skills.add_run(assessment["skills"])
+    skills_text.font.size = Pt(8)
+
+    instructions_title = document.add_paragraph()
+    instructions_title.paragraph_format.space_before = Pt(2)
+    instructions_title.paragraph_format.space_after = Pt(1)
+    title_run = instructions_title.add_run("Instrucciones generales")
+    title_run.bold = True
+    title_run.font.size = Pt(8)
+
+    for item in GENERAL_INSTRUCTIONS:
+        paragraph = document.add_paragraph()
+        paragraph.paragraph_format.space_before = Pt(0)
+        paragraph.paragraph_format.space_after = Pt(0)
+        paragraph.paragraph_format.left_indent = Cm(0.35)
+        run = paragraph.add_run(f"- {item}")
+        run.font.size = Pt(7.8)
 
 
 def add_text_block(document, title, text):
@@ -1210,6 +1307,10 @@ def generate_html(assessment):
         f'<div class="answer-item"><span class="ans-num">{number}.</span> {answers[number]}</div>'
         for number in sorted(answers)
     )
+    header_summary = "".join(
+        f'<span><strong>{label}:</strong> {value}</span>' for label, value in summary_items(assessment)
+    )
+    instruction_items = "".join(f"<li>{item}</li>" for item in GENERAL_INSTRUCTIONS)
 
     score_rows = []
     scores = build_score_rows(TOTAL_POINTS)
@@ -1256,10 +1357,14 @@ def generate_html(assessment):
     }}
     .logo-container img {{ width: 100%; display: block; margin-bottom: -4px; }}
     .test-title {{ text-align: center; font-size: 11pt; font-weight: bold; margin: 4px 0; }}
-    .field-table, .criteria-box, .score-table {{ width: 100%; border-collapse: collapse; }}
-    .field-table td, .criteria-box td, .score-table td, .score-table th {{ border: 1px solid #000; padding: 2px 5px; }}
-    .label {{ background: #e8e8e8; font-weight: bold; }}
-    .criteria-box {{ margin-bottom: 6px; font-size: 8pt; }}
+    .header-panel {{ margin-bottom: 8px; }}
+    .meta-summary {{ display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 16px; padding: 5px 0; border-top: 1px solid #0f4c81; border-bottom: 1px solid #0f4c81; font-size: 8.2pt; }}
+    .student-row {{ display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 18px; padding: 5px 0 4px 0; font-size: 8.2pt; border-bottom: 1px solid #d9d9d9; }}
+    .meta-line {{ margin-top: 4px; font-size: 8pt; line-height: 1.35; }}
+    .instructions-block {{ margin-top: 4px; padding-bottom: 4px; border-bottom: 1px solid #d9d9d9; }}
+    .instructions-title {{ font-size: 8pt; font-weight: bold; margin-bottom: 2px; }}
+    .instructions-list {{ margin: 0; padding-left: 16px; font-size: 7.8pt; line-height: 1.35; }}
+    .instructions-list li {{ margin-bottom: 1px; }}
     .part {{ margin-bottom: 8px; }}
     .part-header {{ background: #2962FF; color: white; padding: 3px 8px; font-weight: bold; font-size: 9pt; margin-bottom: 3px; }}
     .instructions {{ font-style: italic; font-size: 8pt; color: #333; margin-bottom: 4px; line-height: 1.35; }}
@@ -1274,42 +1379,34 @@ def generate_html(assessment):
     .answer-key-subtitle {{ text-align: center; font-size: 8.5pt; color: #555; margin-bottom: 8px; }}
     .answer-grid {{ display: grid; grid-template-columns: repeat(5, 1fr); gap: 2px 12px; font-size: 8pt; }}
     .answer-item .ans-num {{ font-weight: bold; display: inline-block; min-width: 22px; }}
-    .score-table {{ margin-top: 18px; font-size: 8pt; }}
+    .score-table {{ width: 100%; border-collapse: collapse; margin-top: 18px; font-size: 8pt; }}
+    .score-table td, .score-table th {{ border: 1px solid #000; padding: 2px 5px; text-align: center; }}
     .score-table th {{ background: #e8e8e8; }}
     @media print {{
         body {{ background: white; }}
         .page {{ max-width: none; margin: 0; padding: 0; box-shadow: none; }}
-        .part-header, .label {{ -webkit-print-color-adjust: exact; print-color-adjust: exact; }}
+        .part-header {{ -webkit-print-color-adjust: exact; print-color-adjust: exact; }}
     }}
 </style>
 </head>
 <body>
 <div class="page">
-    <div class="logo-container">{logo_html}</div>
-    <div class="test-title">Prueba de Comprension Lectora - Ingles TP - {assessment['course']}</div>
-    <table class="field-table">
-        <tr><td class="label">Profesor:</td><td></td><td class="label">Nombre</td><td colspan="3"></td></tr>
-        <tr><td class="label">Asignatura:</td><td>Idioma Extranjero: Ingles</td><td class="label">Curso</td><td colspan="3">{assessment['course_field']}</td></tr>
-        <tr><td class="label">Prueba N°</td><td>Nota 2 - Semestre 1</td><td class="label">N° Lista</td><td colspan="3"></td></tr>
-        <tr><td class="label">Semestre</td><td>1</td><td class="label">Puntos Obtenidos</td><td></td><td class="label">NOTA</td><td></td></tr>
-        <tr><td class="label">Fecha</td><td colspan="5">___/___/2026</td></tr>
-        <tr><td class="label">Visado por:</td><td colspan="5">EPM Gabriel S. Castro A</td></tr>
-        <tr><td class="label">Objetivo:</td><td colspan="5">{assessment['objective']}</td></tr>
-        <tr><td class="label">Habilidades</td><td colspan="5">{assessment['skills']}</td></tr>
-    </table>
-    <table class="criteria-box">
-        <tr>
-            <td class="label">Instrucciones:</td>
-            <td>
-                • Lee con atencion cada texto antes de responder.<br/>
-                • Cada respuesta correcta vale 2 puntos.<br/>
-                • Marca la alternativa correcta entre A, B, C o D.<br/>
-                • Puntaje total: {TOTAL_POINTS} puntos. Exigencia: 60%.<br/>
-                • Tiempo sugerido: 60 minutos.<br/>
-                • No se permite el uso de diccionario ni celular.
-            </td>
-        </tr>
-    </table>
+    <div class="header-panel">
+        <div class="logo-container">{logo_html}</div>
+        <div class="test-title">Prueba de Comprension Lectora - Ingles TP - {assessment['course']}</div>
+        <div class="meta-summary">{header_summary}</div>
+        <div class="student-row">
+            <span><strong>Nombre:</strong> ________________________________</span>
+            <span><strong>Curso:</strong> __________</span>
+            <span><strong>Fecha:</strong> ___/___/2026</span>
+        </div>
+        <p class="meta-line"><strong>Objetivo:</strong> {assessment['objective']}</p>
+        <p class="meta-line"><strong>Habilidades:</strong> {assessment['skills']}</p>
+        <div class="instructions-block">
+            <p class="instructions-title">Instrucciones generales</p>
+            <ul class="instructions-list">{instruction_items}</ul>
+        </div>
+    </div>
     {''.join(parts_html)}
     <div class="test-footer">- Fin de la evaluacion - Revisa tus respuestas antes de entregar. -</div>
 </div>
@@ -1342,80 +1439,7 @@ def generate_docx(assessment, output_path):
     style.font.name = "Arial"
     style.font.size = Pt(9)
 
-    if LOGO_PATH.exists():
-        paragraph = document.add_paragraph()
-        paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
-        paragraph.add_run().add_picture(str(LOGO_PATH), width=Cm(17.99))
-
-    title = document.add_paragraph()
-    title.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    title.paragraph_format.space_before = Pt(4)
-    title.paragraph_format.space_after = Pt(4)
-    title_run = title.add_run(f"Prueba de Comprension Lectora - Ingles TP - {assessment['course']}")
-    title_run.bold = True
-    title_run.font.size = Pt(11)
-
-    table = document.add_table(rows=8, cols=6)
-    table.alignment = WD_TABLE_ALIGNMENT.CENTER
-    table.style = "Table Grid"
-
-    def set_cell(row, col, text, is_label=False, colspan=1):
-        cell = table.cell(row, col)
-        if colspan > 1:
-            cell.merge(table.cell(row, col + colspan - 1))
-        cell.text = text
-        if is_label:
-            set_cell_shading(cell, "E8E8E8")
-        for paragraph in cell.paragraphs:
-            paragraph.paragraph_format.space_before = Pt(0)
-            paragraph.paragraph_format.space_after = Pt(0)
-            for run in paragraph.runs:
-                run.font.size = Pt(8)
-                if is_label:
-                    run.bold = True
-
-    set_cell(0, 0, "Profesor:", True)
-    set_cell(0, 1, "")
-    set_cell(0, 2, "Nombre", True)
-    set_cell(0, 3, "", colspan=3)
-    set_cell(1, 0, "Asignatura:", True)
-    set_cell(1, 1, "Idioma Extranjero: Ingles")
-    set_cell(1, 2, "Curso", True)
-    set_cell(1, 3, assessment["course_field"], colspan=3)
-    set_cell(2, 0, "Prueba N°", True)
-    set_cell(2, 1, "Nota 2 - Semestre 1")
-    set_cell(2, 2, "N° Lista", True)
-    set_cell(2, 3, "", colspan=3)
-    set_cell(3, 0, "Semestre", True)
-    set_cell(3, 1, "1")
-    set_cell(3, 2, "Puntos Obtenidos", True)
-    set_cell(3, 3, "")
-    set_cell(3, 4, "NOTA", True)
-    set_cell(3, 5, "")
-    set_cell(4, 0, "Fecha", True)
-    set_cell(4, 1, "___/___/2026", colspan=5)
-    set_cell(5, 0, "Visado por:", True)
-    set_cell(5, 1, "EPM Gabriel S. Castro A", colspan=5)
-    set_cell(6, 0, "Objetivo:", True)
-    set_cell(6, 1, assessment["objective"], colspan=5)
-    set_cell(7, 0, "Habilidades", True)
-    set_cell(7, 1, assessment["skills"], colspan=5)
-
-    instructions = document.add_paragraph()
-    instructions.paragraph_format.space_before = Pt(4)
-    instructions.paragraph_format.space_after = Pt(4)
-    instructions_run = instructions.add_run("Instrucciones:\n")
-    instructions_run.bold = True
-    instructions_run.font.size = Pt(8)
-    instructions_text = (
-        "• Lee con atencion cada texto antes de responder.\n"
-        "• Cada respuesta correcta vale 2 puntos.\n"
-        "• Marca la alternativa correcta entre A, B, C o D.\n"
-        "• La prueba tiene 30 puntos en total. Nivel de exigencia: 60%.\n"
-        "• Tienes 60 minutos para completar la prueba.\n"
-        "• No se permite el uso de diccionario ni dispositivos electronicos."
-    )
-    instructions.add_run(instructions_text).font.size = Pt(7.5)
+    add_header_panel(document, assessment)
 
     for part in assessment["parts"]:
         add_part_header(document, part["title"] + " (10 points)")
