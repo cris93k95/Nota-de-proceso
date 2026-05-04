@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Herramienta de Evaluación: Video "Conversation in Action"</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f1f5f9; /* slate-100 */
+        }
+        .rubric-table th, .rubric-table td {
+            border: 1px solid #cbd5e1; /* slate-300 */
+            padding: 0.75rem;
+            text-align: left;
+            vertical-align: top;
+        }
+        .rubric-table th:first-child {
+            width: 20%;
+        }
+        .score-cell {
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            font-size: 0.875rem;
+            line-height: 1.4;
+        }
+        .score-cell:hover {
+            background-color: #e2e8f0; /* slate-200 */
+            opacity: 1 !important;
+        }
+        .unselected-sibling {
+            opacity: 0.4;
+        }
+        .selected {
+            color: white;
+            font-weight: 600;
+            transform: scale(1.02);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            opacity: 1;
+        }
+        .selected.score-4 { background-color: #16a34a; } /* green-600 */
+        .selected.score-3 { background-color: #2563eb; } /* blue-600 */
+        .selected.score-2 { background-color: #f59e0b; } /* amber-500 */
+        .selected.score-1 { background-color: #dc2626; } /* red-600 */
+        
+        .group-card {
+            scroll-margin-top: 20px;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- NUEVO ESTILO PARA ACORDEÓN --- */
+        .collapsible-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-in-out;
+        }
+        .is-open .collapsible-content {
+            max-height: 2500px; /* Valor suficientemente grande para el contenido */
+        }
+        .header-icon {
+            transition: transform 0.3s ease-in-out;
+        }
+        .is-open .header-icon {
+            transform: rotate(90deg);
+        }
+        /* --- FIN NUEVO ESTILO --- */
+    </style>
+</head>
+<body class="p-4 sm:p-6 lg:p-8">
+
+    <div class="max-w-7xl mx-auto">
+        <header class="text-center mb-8">
+            <h1 class="text-3xl sm:text-4xl font-bold text-slate-800">Herramienta de Evaluación: Video "Conversation in Action"</h1>
+            <p class="mt-2 text-lg text-slate-600">Organiza tus evaluaciones por curso. El progreso se guarda automáticamente.</p>
+        </header>
+
+        <div class="mb-8 p-4 bg-white rounded-lg shadow-md flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-4">
+            <button id="addCourseBtn" class="bg-indigo-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-indigo-700 transition-colors shadow-sm w-full sm:w-auto">
+                + Agregar Curso
+            </button>
+            <button id="clearDataBtn" class="bg-red-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-red-700 transition-colors shadow-sm w-full sm:w-auto">
+                Limpiar Todos los Datos
+            </button>
+        </div>
+
+        <div id="coursesContainer" class="space-y-12">
+            </div>
+    </div>
+
+    <script>
+        const { jsPDF } = window.jspdf;
+        const coursesContainer = document.getElementById('coursesContainer');
+        const addCourseBtn = document.getElementById('addCourseBtn');
+        const clearDataBtn = document.getElementById('clearDataBtn');
+        let coursesData = {}; // Object to hold all course data
+        const STORAGE_KEY = 'evaluacionDialogoData_v3'; // Versión actualizada
+
+        const studentDatabase = {
+            '1A': ['ACEVEDO VALDEVENITO ALAN BASTIAN ANDRÉS', 'ACUÑA SEGUEL LUIS STEVEN', 'AGUSTO GONZALEZ EIDAN ALONSO', 'AVENDAÑO ESPINOZA EMILIO ALEJANDRO', 'CANALES ORTIZ EMILIO VICENTE', 'CARABONI ROMÁN EMILIANO ANDRÉ', 'CARREÑO ORTEGA GABRIEL IGNACIO', 'CONEJEROS MENDEZ AGUSTIN', 'CRUZAT PEREZ FELIPE IGNACIO', 'DiAZ MARTiNEZ JOAQUiN ALEJANDRO', 'DIAZ MEDINA LEONEL ALEXANDER', 'DURAN ROJAS BASTIAN ALEIN', 'FAUNDEZ MORENO BENJAMÍN ANTONIO', 'FLORES ROJAS BEnJAMIN ANDRES', 'GAETE GAETE ALAN NICOLAS ESTEBAN', 'Gonzalez Aceiton Vicente Nibaldo', 'GONZALEZ ARAVENA JOSE SEGUNDO', 'GONZALEZ HERRERA KEVIN ANDRES', 'GUTIERREZ INOSTROZA MARCO ARTURO', 'HENRIQUEZ MORALES MARTIN ESTEBAN', 'JOFRE CERPA MATÍAS RODRIGO', 'MOLINA TORRALES LEON ALONZO', 'MORAN VERGARA BENJAMIN ABEL', 'MORENO MUÑOZ MARTIN ALEJANDRO', 'NORAMBUENA CASTRO LEONARDO ENRIQUE ANTONIO', 'PEÑA INOSTROZA OSCAR DANIEL', 'RAMIREZ FUENTES MAXIMILIANO ANDRES', 'RAMOS MALDONADO JULLIANO ALEXANDER', 'RAYO CONCHA JULIO ANTONIO', 'RIQUELME RIQUELME MIGUEL ALEXIS', 'SALAS TOLEDO SEBASTIAN NICOLAS', 'SALDIAS GAJARDO DIEGO ALEXIS', 'SAN MARTIN GUTIERREZ MATIAS ANTONIO', 'SANCHEZ AGUILAR ELIEL ISAIAS', 'SEPULVEDA MENDEZ CRISTOPHER MAXIMILIANO', 'TRONCOSO SALAS BENJAMÍN ISAIAS', 'URBINA CIFUENTES JEAN LUCAS', 'VALENZUELA VARELA AGUSTIN IGNACIO', 'VARELA BASTIAS JULIAN IGNACIO', 'VARGAS CHAVEZ ALVARO FELIPE', 'VASQUEZ VILLAR DAMIAN NICOLAS', 'VERA MORALES JOSE CRISTOBAL', 'VERDUGO VEGA MAURICIO ABRAHAM', 'VIERA JAQUE NICOLAS MAXIMO', 'VILLASECA ROJAS ARMANDO ENRIQUE', 'GAJARDO IBAÑEZ JEAN IGNACIO', 'BUSTAMANTE PARRA RENATO CRISTIANO IGNACIO', 'CASTRO OSORIO AGUSTIN TOMAS', 'ARISMENDY LASERNA ISAC DANIEL'],
+            '1B': ['ANDRADES MUÑOZ MANUEL EMILIO', 'ARAVENA DIAZ RODRIGO EDUARDO', 'ARENA CARRASCO ALONSO JAVIER', 'Ayala Bravo Fabian Alejandro', 'BORQUEZ CATALAN MATEO LORENZO', 'CAMUS OSORIO BENJAMIN IGNACIO', 'CARTAJENA RAMÍREZ LUIS GABRIEL', 'CASTRO CASTRO NICOLAS GASPAR', 'CERDA VALENZUELA RENATO JAVIER', 'CID HERNANDEZ GUILLERMO JAHANS JAHIRENS', 'CONTRERAS SALAZAR NÍKOLAS BENJAMÍN EDUARDO', 'DELGADO CASTRO MAXIMO ALEJANDRO', 'FARiAS FAuNDEZ LUIS ESTEBAN ANTONIO', 'FARIAS JIMENEZ GABRIEL EDUARDO', 'GARCIA ALCANTAR WILLIAMS ALEXSANDER', 'GONZALEZ LABRAÑA ANGEL ANDRES', 'GONZÁLEZ PAILLALEVE DIEGO ALONSO', 'GUTIERREZ ZUÑIGA DAMIAN RICARDO ANTONIO', 'HERNANDEZ ARAYA IGNACIO ANDRES', 'HIPPOLYTHE WOOBENS', 'HUENUL ROJAS JUAN DAVID', 'LOBOS LOPEZ GASPAR EDUARDO', 'LUZARDO MEDINA ADRIAN EDUARDO', 'MACHADO ARAVENA BASTIAN VICENTE', 'MANCILLA VILLALOBOS CHRISTIAN FELIPE', 'MEDINA CID TOMAS ANTONIO', 'MORALES ALVAREZ BENJAMIN ALEJANDRO', 'MORALES ROJAS GABRIEL IGNACIO', 'NOVOA CASTILLO GABRIEL JESUS', 'PALAVECINO ROJAS MATIAS BENJAMIN', 'PAVEZ SALAS DYLAN GASPAR', 'PEREZ ROJAS MARTIN ALONSO', 'PRADO PEREZ CARLOS ERNESTO', 'REYES CATRIPÁN FABIÁN ALEXIS', 'ROJAS RAMIREZ JONATHAN DANIEL', 'ROJAS SALAS EMMANUEL ALEXANDER', 'ROMERO JORQUERA VICENTE', 'SALDAÑO HERNANDEZ DIEGO ALONSO', 'SOTO SEGURA JUSTIN JOSUE', 'URRA ARELLANO PIERO ANTONIO', 'VALDES JAQUE CRISTOBAL AARON', 'VALLEJOS ROJAS MAXIMILIANO JARA', 'VARGAS DIAZ AGUSTÍN CARLOS TOMÁS', 'VASQUEZ VILLALOBOS CESAR ELIAZAR', 'VOLTAIRE JOHN TODLER', 'YAÑEZ FUENTES AGUSTIN ANDRES', 'TORRES LOPEZ MARCELO EMILIANO', 'URIBE CORNEJO MATIAS', 'FAUNDEZ FAUNDEZ CARLOS GABRIEL ALEXANDER', 'TAPIA ILABACA LUCAS JESUS', 'VEGA MURGA VICENTE ALONSO', 'GONZALEZ GONZALEZ BENJAMIN IGNACIO'],
+            '1C': ['ALBORNOZ ORTEGA FRANCISCO JAVIER', 'ARAVENA ARCOS RODRIGO ANTONIO', 'ARELLANO CABRERA BYRON BENJAMIN YORSHUA', 'ARENAS MORAGA SIMON ESTEBAN', 'BADILLA CASTILLO JESUS ANDRES', 'BRIONES GONZÁLEZ MATÍAS ALBERTO', 'BRUNING CAYUQUEO DANIEL ALONSO', 'CABION GARRIDO GORKA DOMENEC', 'CACERES CRUZAT EMANUEL ISAIAS', 'CAÑETE MORALES MARTIN ALONSO', 'ESPINOSA GONZALEZ ANDRES DE JESUS', 'FERNÁNDEZ LUNA OMAR ORLANDO DE JESÚS', 'FIGUEROA BUSTAMENTE THOMAS ARON EMILIANO', 'GONZALEZ ARAYA MARTIN IGNACIO', 'GONZALEZ MUÑOZ MARTIN ALONSO', 'GONZALEZ VENEGAS MATIAS NATANIEL', 'HERNANDEZ MEJIAS FELIPE IGNACIO', 'JEREZ ARAVENA CRISTÓBAL EMILIANO', 'LEAL JIMENEZ MARCELO IGNACIO', 'MATURANA NÚÑEZ JAIME OSVALDO', 'MOLINA MARAMBIO PATRICIO JOSE', 'MOLINA VASQUEZ JEREMY ALEXANDER', 'MONTERO VILLAGRA MARTIN IGNACIO', 'MUÑOZ CANALES MARTÍN EDUARDO ANDRÉS', 'MUÑOZ VILLEGAS BENJAMIN ESTEBAN', 'MUÑOZ YAÑEZ BRUNO ALONSO', 'NEIRA GONZALEZ ANIBAL IGNACIO', 'NUÑEZ ARELLANO JUAN ANTONIO', 'OPAZO ROJAS THOMAS IGNACIO', 'PADRON CABRERA EDWIN ELIEZER', 'PALMA LOPEZ CRISTOBAL ANTONIO', 'PARRA YÁÑEZ LUIS ORLANDO', 'RAMIREZ BENAVIDES BENJAMIN ANDRES', 'Reyes Calderon Gabriel Andres', 'RIOSECO VILCHES HECTOR JEREMIAS', 'ROJAS GONZALEZ NICOLAS CARLOS ALFREDO', 'ROJAS HERRERA MARTIN ALONSO', 'SALAS SALAS ALEJANDRO ESTEBAN', 'SALAS SALAS JOAQUÍN ENRIQUE', 'SALAZAR PADILLA MARTIN SANDRINO', 'Salgado Monsalve Maximiliano Esteban', 'SEPULVEDA ORELLANA MARTIN HERNAN', 'TORRES NEIRA Bastián Jassiel', 'VILLALOBOS CORTÉS AGUSTÍN ELÍAS', 'VERGARA RAMIREZ ESTEBAN BENJAMIN', 'INFANTE PASTENE BRAYAN JESUS', 'HERRERA GONZALEZ VICENTE EMILIO', 'CERDA OYARZUN YEISON YAMPIER', 'TORRES TORRES EDMUNDO ANDRÉ GABRIEL', 'QUINTANILLA QUINTANA TOMAS ALFONSO', 'BOBADILLA HERNANDEZ GONZALO ESTEBAN', 'AMARO STULL JESUS NICOLAS'],
+            '1D': ['ABARZUA CEPEDA VICTOR FELIPE DE JESUS', 'ACEVEDO CANALES YOSTIN ALEJANDRO', 'ARAYA HERRERA IAN BASTIAN', 'ARENAS AGUIRRE CRISTOBAL MIGUEL', 'CAMPOS GOMEZ MIGUEL ALEXIS', 'CASTRO MALDONADO BENJAMIN ANTONIO', 'COFRÉ ALMONACID ERICK JESÚS', 'CORDOVA ANDRADE LUCAS HUMBERTO', 'DONAIRE PUNTARELLI CARLOS ALEXIS', 'FLORES VALENZUELA DYLAN ALEXANDER', 'FUENTES NAVARRO GABRIEL SEBASTIAN', 'FUENTES OTAROLA AGUSTIN FELIPE', 'FUENTES SEPULVEDA JOSE NICOLAS', 'GALVEZ NOVOA JOAQUIN GUSTAVO', 'GONZALEZ MUÑOZ MARCELO IGNACIO', 'GONZALEZ SALCEDO VICENTE JESUS', 'HERNANDEZ PULGAR BENJAMIN NICOLAS', 'IBAÑEZ URRUTIA CARLOS JOAQUIN ALBERTO', 'LAGOS CONTRERAS MARTÍN NICOLÁS', 'LEON SANCHEZ ANGEL GABRIEL', 'LOPEZ GONZALEZ MIGUEL ANGEL', 'LÓPEZ OLIVARES RAFAEL ALONSO', 'MARTINEZ GOMEZ JORDAN JOAQUIN', 'MENDEZ BRAVO JOAQUIN IGNACIO', 'MOYA VÁSQUEZ LUCAS BENJAMÍN', 'MUÑOZ VILLAGRAN JOAQUIN ALEJANDRO', 'NOVOA ROJAS GABRIEL ANTONIO', 'OYARCE QUIROZ WILLIAMS OMAR', 'PARMA GUAJARDO Joaquín Ignacio', 'PEÑA MANZANILLO KELVIN JOSE', 'PEREZ GUAJARDO DAMIAN NICOLAS MATEO', 'QUEVEDO OLAVE ALEX JAVIER', 'ROJAS VALDIVIA JOSÉ PABLO', 'ROMERO URRUTIA BASTÍAN ANDRÉS', 'SALAS DÍAZ THOMAS VICENTE', 'SALAS QUEZADA MARTIN ANTONIO', 'SANCHEZ CERDA BENJAMIN THOMAS', 'SOTO DOMINGUEZ MAXIMILIANO ALFREDO', 'TAPIA ARAYA BENJAMIN ALONSO', 'UMAÑA MONTECINO JOSE ALEJANDRO', 'VALDERRAMA ALFARO CARLOS VICENTE', 'VALDES ALBORNOZ JORGE ALEXANDER', 'VASQUEZ POBLETE MIGUEL NICOLAS', 'VEGA CÁCERES JOSÉ MANUEL', 'VERGARA CATALÁN JOAQUÍN ANTONIO', 'GONZALEZ SAGASTIBELZA CRISTOBAL ALONSO', 'NICOLAO CORVELEYN JOAQUIN TOMAS ARIEL', 'YAÑEZ SUAREZ VICENTE MAURICIO'],
+            '1E': ['AREVALO LOYOLA VICENTE ALONSO', 'BARTIERRA CASTILLO XAVIER EDUARDO', 'CARIMAN MIRANDA BENJHAMIN JOHAQUIN ESTEBAN', 'CARREÑO MORALES GERARDO SEBASTIAN', 'CASTILLO OROSTICA BRAYAN ANTONIO', 'CESPEDES ARIAS JOHANS LUIS', 'CHAVEZ VERGARA JOSE MANUEL', 'CORTES TAPIA EMANUEL ESTEBAN', 'DE LA FUENTE GOMEZ RAFAEL ANTONIO', 'FAUNDEZ CONTRERAS VICENTE ALBERTO', 'FONSECA SEPULVEDA CRISTIAN MANUEL', 'FUENTES MARTINEZ BENJAMIN MAURICIO', 'GAJARDO NUÑEZ WILLIAN ALONSO', 'GALVEZ MILLARD DANIEL ALONSO', 'GARCIA ROJAS SEBASTIAN MAXIMILIANO', 'GAVILAN DIAZ VICTOR FELIPE', 'GUTIERREZ CISTERNA MAXIMILIANO AGUSTIN', 'GUTIERREZ PAREDES AGUSTIN ALEJANDRO', 'HERNANDEZ CACERES MAXIMILIANO REY NICOLAS', 'JAUREGUI GONZALEZ JOAQUIN ALONSO', 'LARA VALDEBENITO CRISTIAN FELIPE', 'MARIN SANTANDER GABRIEL ALEXANDER', 'MARTÍNEZ CONTARDO DAVID SAÚL', 'MEDINA CERDA MATÍAS ALEXANDER', 'MORENO TORRES ARIEL ALFONSO', 'MOYA MUÑOZ CAMILO ANTONIO', 'NUÑEZ URZUA FELIX ANTONIO', 'PARRA MENDOZA PABLO ANDRES', 'PELDOZA GARRIDO ALONSO ESTEBAN', 'QUEVEDO QUINTEROS BENJAMIN ALEJANDRO MATIAS', 'QUINTEROS AMIGO JULIÁN ALEJANDRO', 'RIOS DE LA FUENTE MATIAS ALBERTO', 'RIVERA RAMIREZ AGUSTIN ESTEBAN', 'ROJAS CABELLO SEBASTIAN MATIAS', 'SAAVEDRA BAEZA MAXIMILIANO RAFAEL PEDRO', 'SAAVEDRA MIGUELES MATIAS PEDRO JOSE', 'SEPÚLVEDA GONZÁLEZ GUILLERMO JESUS', 'STOBER ESPINOSA GUILLERMO ALEXANDER', 'TRONCOSO MORAGA SEBASTIAN ALONSO', 'VALENZUELA CAYHUAN JOAQUIN ELIAN', 'VALENZUELA SÁNCHEZ LUIS MATÍAS', 'VARGAS CÁCERES BENJAMÍN ANTONIO', 'VELIZ RIQUELME BRANDON LUIS ENRIQUE', 'YAÑEZ FUENZALIDA NICOLAS ANDRES', 'YEVENES VERDUGO ANGEL DAVID', 'PEÑA Bernal Gaspar Andre', 'CIFUENTES CHAMORRO BRYAN ANDRES', 'SALGADO BARRERA JOAQUIN IGNACIO']
+        };
+
+        const rubricStructure = [
+            { id: 'c1', name: 'Uso de Tiempos Verbales', descriptions: { 1: 'No utiliza las estructuras gramaticales solicitadas.', 2: 'Intenta usar los tiempos verbales, pero comete errores frecuentes.', 3: 'Utiliza los 4 tiempos verbales correctamente la mayor parte del tiempo.', 4: 'Utiliza los 4 tiempos verbales de forma precisa, natural y en contextos apropiados.' }},
+            { id: 'c2', name: 'Fluidez y Pronunciación', descriptions: { 1: 'El discurso es muy lento y difícil de entender.', 2: 'Habla de forma entrecortada, la pronunciación dificulta la comprensión.', 3: 'Habla con buena fluidez, pero con algunas pausas.', 4: 'Habla con un ritmo natural y fluido. La pronunciación es clara.' }},
+            { id: 'c3', name: 'Contenido y Vocabulario', descriptions: { 1: 'El diálogo es incoherente o irrelevante.', 2: 'El diálogo es básico y el vocabulario es limitado.', 3: 'El diálogo es coherente y relevante con vocabulario adecuado.', 4: 'El diálogo es coherente, creativo y relevante. Usa vocabulario amplio y preciso.' }},
+            { id: 'c4', name: 'Actuación y Creatividad', descriptions: { 1: 'No hay actuación ni interacción.', 2: 'La actuación es poco natural, se nota que leen.', 3: 'La actuación es buena y se nota un esfuerzo creativo.', 4: 'La actuación es muy convincente, natural y creativa.' }},
+            { id: 'c5', name: 'Uso Creativo del Elemento Secreto', descriptions: { 1: 'No incluyen el elemento secreto.', 2: 'La inclusión del elemento se siente forzada.', 3: 'Integran el elemento secreto de forma correcta y lógica.', 4: 'Integran el elemento secreto de forma brillante, lógica y memorable.' }},
+            { id: 'c6', name: 'Producción y "Detrás de Cámaras"', descriptions: { 1: 'Video de muy mala calidad y sin bloopers.', 2: 'Calidad deficiente y/o clip de bloopers ausente/corto.', 3: 'Buena calidad de video. Se incluye un clip de bloopers simple.', 4: 'Excelente calidad y edición. El clip de bloopers es divertido y complementa.' }},
+            { id: 'c7', name: 'Colaboración Grupal', descriptions: { 1: 'Solo uno o dos miembros participan.', 2: 'Participación desigual, uno o dos dominan.', 3: 'Participación mayormente equitativa.', 4: 'Todos los miembros participan de forma equitativa y activa.' }},
+            { id: 'c8', name: 'Duración y Cumplimiento del Tiempo', descriptions: { 1: 'No respeta el requisito de duración (menos de 3 min).', 2: 'Se aleja significativamente de la duración solicitada.', 3: 'Se acerca a la duración, pero es un poco corto/largo.', 4: 'Cumple con la duración solicitada (aprox. 5 min).' }},
+            { id: 'c9', name: 'Puntualidad en la Entrega', descriptions: { 1: 'Entregado con 3 o más clases de retraso.', 2: 'Entregado con 2 clases de retraso.', 3: 'Entregado con 1 clase de retraso.', 4: 'Entregado en la fecha y hora acordada.' }}
+        ];
+        
+        function saveData() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(coursesData));
+        }
+
+        function loadData() {
+            const data = localStorage.getItem(STORAGE_KEY);
+            if (data) {
+                coursesData = JSON.parse(data);
+                renderAllCourses();
+            }
+        }
+        
+        function renderAllCourses() {
+            coursesContainer.innerHTML = '';
+            const sortedCourseNames = Object.keys(coursesData).sort();
+            sortedCourseNames.forEach(courseName => {
+                const courseData = coursesData[courseName];
+                const courseHTML = createCourseCard(courseName, courseData);
+                coursesContainer.insertAdjacentHTML('beforeend', courseHTML);
+                renderAllGroupsForCourse(courseName);
+            });
+        }
+
+        function renderAllGroupsForCourse(courseName) {
+            const groupsContainer = document.getElementById(`groups-container-${courseName}`);
+            groupsContainer.innerHTML = '';
+            const courseData = coursesData[courseName];
+            courseData.groups.forEach(group => {
+                const groupHTML = createGroupCard(courseName, group);
+                groupsContainer.insertAdjacentHTML('beforeend', groupHTML);
+                updateGroupUI(courseName, group.id);
+            });
+        }
+
+        function createCourseCard(courseName, courseData) {
+            return `
+                <div id="course-${courseName}" class="course-card bg-white p-6 rounded-xl shadow-lg border-t-4 border-indigo-500 fade-in">
+                    <div class="flex justify-between items-center mb-6">
+                        <div>
+                            <span class="text-sm font-semibold text-gray-500">CURSO</span>
+                            <h2 class="text-3xl font-bold text-slate-800">${courseName}</h2>
+                        </div>
+                        <button class="delete-course-btn text-red-500 hover:text-red-700 font-semibold" data-course-name="${courseName}">Eliminar Curso</button>
+                    </div>
+                    <div id="groups-container-${courseName}" class="space-y-4">
+                        </div>
+                    <div class="mt-8 pt-6 border-t border-slate-200">
+                        <button class="add-group-btn bg-blue-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-blue-700 transition-colors shadow-sm" data-course-name="${courseName}">
+                            + Agregar Grupo a ${courseName}
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function createGroupCard(courseName, group) {
+            const isOpen = group.isOpen === true;
+            let availableStudents = [];
+            const courseKey = Object.keys(studentDatabase).find(key => courseName.toUpperCase().includes(key));
+            if (courseKey) {
+                const allStudentsInCourse = studentDatabase[courseKey];
+                const assignedStudents = coursesData[courseName].groups.flatMap(g => g.members);
+                availableStudents = allStudentsInCourse.filter(s => !assignedStudents.includes(s) || group.members.includes(s));
+            }
+
+            const studentOptions = availableStudents.sort().map(student => `<option value="${student}">${student}</option>`).join('');
+            const studentSelectorHTML = `
+                <div class="flex items-center space-x-2">
+                    <select class="student-select flex-grow border border-slate-300 rounded-md px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="">Selecciona un estudiante...</option>
+                        ${studentOptions}
+                    </select>
+                    <button class="add-student-btn bg-slate-200 text-slate-800 font-semibold px-4 py-1.5 rounded-md hover:bg-slate-300 transition-colors">Agregar</button>
+                </div>`;
+
+            let rubricHTML = '<thead class="bg-slate-50 text-slate-600 text-sm"><tr><th>Criterio</th><th>Insuficiente (1)</th><th>Suficiente (2)</th><th>Bueno (3)</th><th>Excelente (4)</th></tr></thead><tbody>';
+            rubricStructure.forEach(criterion => {
+                rubricHTML += `<tr data-criterion-id="${criterion.id}">
+                    <td class="font-medium text-slate-800">${criterion.name}</td>
+                    <td class="score-cell score-1" data-score="1">${criterion.descriptions[1]}</td>
+                    <td class="score-cell score-2" data-score="2">${criterion.descriptions[2]}</td>
+                    <td class="score-cell score-3" data-score="3">${criterion.descriptions[3]}</td>
+                    <td class="score-cell score-4" data-score="4">${criterion.descriptions[4]}</td>
+                </tr>`;
+            });
+            rubricHTML += `</tbody>`;
+
+            const membersHTML = group.members.map(name => `<li class="flex items-center justify-between">${name} <button class="remove-student-btn text-red-500 text-xs font-bold ml-2" data-student-name="${name}">X</button></li>`).join('');
+
+            return `
+                <div id="group-${courseName}-${group.id}" class="group-card bg-slate-50 p-4 sm:p-6 rounded-lg shadow-md border-l-4 border-blue-500 ${isOpen ? 'is-open' : ''}">
+                    <div class="group-header-trigger flex justify-between items-center cursor-pointer">
+                        <div class="flex items-center space-x-3">
+                            <span class="header-icon text-slate-500 text-xl font-bold">▶</span>
+                            <h3 class="text-2xl font-bold text-slate-800">Grupo ${group.number}</h3>
+                        </div>
+                        <button class="delete-group-btn text-red-500 hover:text-red-700 font-semibold z-10 relative" data-group-id="${group.id}" data-course-name="${courseName}">Eliminar Grupo</button>
+                    </div>
+                    <div class="collapsible-content pt-4">
+                        <div class="mb-6"><h4 class="font-semibold text-slate-700 mb-2">Integrantes:</h4><ul class="list-disc list-inside text-slate-600 members-list mb-2 space-y-1">${membersHTML}</ul>${studentSelectorHTML}</div>
+                        <div class="overflow-x-auto"><table class="rubric-table w-full border-collapse">${rubricHTML}</table></div>
+                        <div class="mb-6 mt-6">
+                            <h4 class="font-semibold text-slate-700 mb-2">Retroalimentación:</h4>
+                            <textarea class="feedback-textarea w-full border border-slate-300 rounded-md p-2" rows="4" placeholder="Escribe aquí la retroalimentación para el grupo...">${group.feedback || ''}</textarea>
+                        </div>
+                        <div class="mt-6 p-4 bg-white rounded-lg flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0 sm:space-x-8">
+                            <button class="download-pdf-btn bg-green-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-green-700 transition-colors shadow-sm">Descargar Informe PDF</button>
+                            <div class="flex space-x-8">
+                            <div class="text-center"><p class="text-sm font-medium text-slate-500">PUNTAJE TOTAL</p><p class="total-score text-3xl font-bold text-slate-800">0 / 36</p></div>
+                            <div class="text-center"><p class="text-sm font-medium text-slate-500">NOTA FINAL (60%)</p><p class="final-grade text-3xl font-bold text-blue-600">1.0</p></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+        }
+        
+        function updateGroupUI(courseName, groupId) {
+            const groupData = coursesData[courseName].groups.find(g => g.id == groupId);
+            if (!groupData) return;
+            const groupCard = document.getElementById(`group-${courseName}-${groupId}`);
+
+            groupCard.querySelectorAll('tr[data-criterion-id]').forEach(row => {
+                const criterionId = row.dataset.criterionId;
+                const savedScore = groupData.scores[criterionId];
+                row.querySelectorAll('.score-cell').forEach(cell => {
+                    cell.classList.remove('selected', 'unselected-sibling');
+                    if (savedScore) {
+                        if (parseInt(cell.dataset.score) === savedScore) {
+                            cell.classList.add('selected');
+                        } else {
+                            cell.classList.add('unselected-sibling');
+                        }
+                    }
+                });
+            });
+            calculateResults(courseName, groupId);
+        }
+
+        addCourseBtn.addEventListener('click', () => {
+            const courseName = prompt("Ingresa el nombre del nuevo curso (ej: 1D, 1E, etc.):");
+            if (courseName && courseName.trim() !== "") {
+                const safeCourseName = courseName.trim().toUpperCase();
+                if (coursesData[safeCourseName]) {
+                    alert("Ya existe un curso con ese nombre."); return;
+                }
+                coursesData[safeCourseName] = { groups: [], groupCounter: 0 };
+                saveData();
+                renderAllCourses();
+            }
+        });
+
+        clearDataBtn.addEventListener('click', () => {
+            if (confirm('¿Estás seguro de que quieres borrar TODOS los cursos y datos? Esta acción no se puede deshacer.')) {
+                localStorage.removeItem(STORAGE_KEY);
+                coursesData = {};
+                renderAllCourses();
+            }
+        });
+
+        coursesContainer.addEventListener('click', e => {
+            const target = e.target;
+
+            if (target.matches('.add-group-btn')) {
+                const courseName = target.dataset.courseName;
+                const courseData = coursesData[courseName];
+                courseData.groupCounter++;
+                const newGroup = { id: Date.now(), number: courseData.groupCounter, members: [], scores: {}, feedback: '', isOpen: true }; // Nuevos grupos se abren por defecto
+                courseData.groups.push(newGroup);
+                saveData();
+                renderAllGroupsForCourse(courseName);
+                document.getElementById(`group-${courseName}-${newGroup.id}`).scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+
+            if (target.matches('.delete-course-btn')) {
+                const courseName = target.dataset.courseName;
+                if (confirm(`¿Estás seguro de que quieres eliminar el curso "${courseName}" y todos sus grupos?`)) {
+                    delete coursesData[courseName];
+                    saveData();
+                    renderAllCourses();
+                }
+            }
+
+            const headerTrigger = target.closest('.group-header-trigger');
+            if (headerTrigger) {
+                if (target.matches('.delete-group-btn')) return; // Evita que el botón de eliminar colapse el grupo
+                const groupCard = headerTrigger.closest('.group-card');
+                const [_, courseName, groupId] = groupCard.id.split('-');
+                const groupData = coursesData[courseName].groups.find(g => g.id == groupId);
+                
+                groupData.isOpen = !groupData.isOpen;
+                saveData();
+                groupCard.classList.toggle('is-open');
+            }
+
+            const groupCard = target.closest('.group-card');
+            if (!groupCard) return;
+            
+            const [_, courseName, groupId] = groupCard.id.split('-');
+            const groupData = coursesData[courseName].groups.find(g => g.id == groupId);
+            
+            if (target.matches('.add-student-btn')) {
+                const select = target.previousElementSibling;
+                const studentName = select.value;
+                if (studentName && !groupData.members.includes(studentName)) {
+                    groupData.members.push(studentName);
+                    saveData();
+                    renderAllGroupsForCourse(courseName);
+                }
+            }
+
+            if (target.matches('.remove-student-btn')) {
+                const studentNameToRemove = target.dataset.studentName;
+                groupData.members = groupData.members.filter(m => m !== studentNameToRemove);
+                saveData();
+                renderAllGroupsForCourse(courseName);
+            }
+            
+            if (target.matches('.delete-group-btn')) {
+                if (confirm(`¿Estás seguro de que quieres eliminar el Grupo ${groupData.number} del curso ${courseName}?`)) {
+                    coursesData[courseName].groups = coursesData[courseName].groups.filter(g => g.id != groupId);
+                    saveData();
+                    renderAllGroupsForCourse(courseName);
+                }
+            }
+
+            if (target.matches('.score-cell')) {
+                const criterionId = target.closest('tr').dataset.criterionId;
+                const score = parseInt(target.dataset.score);
+                groupData.scores[criterionId] = score;
+                updateGroupUI(courseName, groupId);
+                saveData();
+            }
+            
+            if (target.matches('.download-pdf-btn')) {
+                 generatePDF(courseName, groupId);
+            }
+        });
+        
+        coursesContainer.addEventListener('input', e => {
+            if (e.target.matches('.feedback-textarea')) {
+                const groupCard = e.target.closest('.group-card');
+                const [_, courseName, groupId] = groupCard.id.split('-');
+                const groupData = coursesData[courseName].groups.find(g => g.id == groupId);
+                groupData.feedback = e.target.value;
+                saveData();
+            }
+        });
+
+        function calculateResults(courseName, groupId) {
+            const groupData = coursesData[courseName].groups.find(g => g.id == groupId);
+            if (!groupData) return;
+
+            const totalScore = Object.values(groupData.scores).reduce((sum, score) => sum + (score || 0), 0);
+            const maxScore = rubricStructure.length * 4;
+            const finalGrade = calculateGrade(totalScore, maxScore, 0.60);
+
+            const groupCard = document.getElementById(`group-${courseName}-${groupId}`);
+            groupCard.querySelector('.total-score').textContent = `${totalScore} / ${maxScore}`;
+            groupCard.querySelector('.final-grade').textContent = finalGrade.toFixed(1);
+        }
+        
+        function calculateGrade(score, maxScore, exigency) {
+            if (score === null || score === undefined) return 1.0;
+            const passingScore = maxScore * exigency;
+            let grade;
+            if (score >= passingScore) {
+                grade = 4.0 + 3.0 * ((score - passingScore) / (maxScore - passingScore));
+            } else {
+                 if (passingScore === 0) return 7.0;
+                 grade = 1.0 + 3.0 * (score / passingScore);
+            }
+            return Math.max(1.0, Math.min(7.0, grade));
+        };
+
+        async function generatePDF(courseName, groupId) {
+            const doc = new jsPDF();
+            const groupData = coursesData[courseName].groups.find(g => g.id == groupId);
+            const groupCard = document.getElementById(`group-${courseName}-${groupId}`);
+
+            doc.setFontSize(22);
+            doc.setFont("helvetica", "bold");
+            doc.text("Informe: Video \"Conversation in Action\"", 105, 20, { align: "center" });
+
+            doc.setFontSize(12);
+            doc.setFont("helvetica", "bold");
+            doc.text("Curso:", 20, 40);
+            doc.text("Grupo:", 20, 47);
+            doc.text("Integrantes:", 20, 54);
+            doc.setFont("helvetica", "normal");
+            doc.text(courseName, 45, 40);
+            doc.text(String(groupData.number), 45, 47);
+            let yPos = 54;
+            groupData.members.forEach(member => {
+                doc.text(member, 45, yPos);
+                yPos += 7;
+            });
+            yPos = Math.max(yPos, 54) + 10;
+
+            const chartCanvas = document.createElement('canvas');
+            const labels = rubricStructure.map(c => c.name);
+            const data = labels.map(label => {
+                const criterion = rubricStructure.find(c => c.name === label);
+                return groupData.scores[criterion.id] || 0;
+            });
+
+            new Chart(chartCanvas, {
+                type: 'radar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Puntaje Obtenido',
+                        data: data,
+                        fill: true,
+                        backgroundColor: 'rgba(37, 99, 235, 0.2)',
+                        borderColor: 'rgb(37, 99, 235)',
+                        pointBackgroundColor: 'rgb(37, 99, 235)',
+                    }]
+                },
+                options: {
+                    scales: { r: { suggestedMin: 0, suggestedMax: 4, ticks: { stepSize: 1 }}},
+                    plugins: { legend: { display: false } }
+                }
+            });
+            await new Promise(resolve => setTimeout(resolve, 500));
+            const chartImage = chartCanvas.toDataURL('image/png');
+            doc.addImage(chartImage, 'PNG', 20, yPos, 170, 85);
+            yPos += 95;
+
+            doc.setFontSize(14);
+            doc.setFont("helvetica", "bold");
+            doc.text("Retroalimentación", 20, yPos);
+            yPos += 8;
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(11);
+            const feedbackText = groupData.feedback || "No se ha ingresado retroalimentación.";
+            const splitFeedback = doc.splitTextToSize(feedbackText, 170);
+            doc.text(splitFeedback, 20, yPos);
+            
+            doc.addPage();
+            
+            doc.setFontSize(14);
+            doc.setFont("helvetica", "bold");
+            doc.text("Detalle de Calificación", 105, 20, { align: "center" });
+
+            const rubricTable = groupCard.querySelector('.rubric-table');
+            const canvas = await html2canvas(rubricTable, { scale: 2 });
+            const tableImage = canvas.toDataURL('image/png');
+            const imgProps = doc.getImageProperties(tableImage);
+            const pdfWidth = doc.internal.pageSize.getWidth();
+            const imgWidth = pdfWidth - 40;
+            const imgHeight = (imgProps.height * imgWidth) / imgProps.width;
+
+            doc.addImage(tableImage, 'PNG', 20, 30, imgWidth, imgHeight);
+
+            doc.save(`Informe_${courseName}_Grupo_${groupData.number}.pdf`);
+        }
+
+        document.addEventListener('DOMContentLoaded', loadData);
+    </script>
+</body>
+</html>

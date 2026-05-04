@@ -1,0 +1,1126 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Presentation: My Technical Skills — 3° Medio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #fff8f0;
+        }
+        .rubric-table th, .rubric-table td {
+            border: 1px solid #fed7aa;
+            padding: 0.75rem;
+            text-align: left;
+            vertical-align: top;
+        }
+        .rubric-table th:first-child {
+            width: 18%;
+        }
+        .rubric-table th {
+            background-color: #fff7ed;
+            color: #9a3412;
+            font-weight: 600;
+        }
+        .score-cell {
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            font-size: 0.84rem;
+            line-height: 1.4;
+        }
+        .score-cell:hover {
+            background-color: #ffedd5;
+            opacity: 1 !important;
+        }
+        .unselected-sibling {
+            opacity: 0.35;
+        }
+        .selected {
+            color: white;
+            font-weight: 600;
+            transform: scale(1.02);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            opacity: 1;
+        }
+        .selected.score-4 { background-color: #16a34a; }
+        .selected.score-3 { background-color: #2563eb; }
+        .selected.score-2 { background-color: #f59e0b; }
+        .selected.score-1 { background-color: #dc2626; }
+
+        .student-card {
+            scroll-margin-top: 20px;
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .collapsible-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-in-out;
+        }
+        .is-open .collapsible-content {
+            max-height: 4000px;
+        }
+        .header-icon {
+            transition: transform 0.3s ease-in-out;
+        }
+        .is-open .header-icon {
+            transform: rotate(90deg);
+        }
+        .top-gradient {
+            background: linear-gradient(135deg, #e65100 0%, #f57c00 50%, #ff9800 100%);
+        }
+        .specialty-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 3px 12px;
+            border-radius: 9999px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .specialty-automotriz { background: #fee2e2; color: #991b1b; }
+        .specialty-electricidad { background: #fef3c7; color: #92400e; }
+        .specialty-electronica { background: #dbeafe; color: #1e40af; }
+        .specialty-grafica { background: #f3e8ff; color: #6b21a8; }
+        .specialty-industrial { background: #dcfce7; color: #166534; }
+
+        .instruction-section {
+            background: linear-gradient(to bottom right, #fff7ed, #ffedd5);
+            border: 2px solid #fb923c;
+        }
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px 8px;
+            border-radius: 9999px;
+            font-size: 0.65rem;
+            font-weight: 700;
+        }
+        .status-pending { background: #f3f4f6; color: #6b7280; }
+        .status-evaluated { background: #dcfce7; color: #166534; }
+
+        @media print {
+            .no-print { display: none !important; }
+        }
+    </style>
+</head>
+<body class="p-4 sm:p-6 lg:p-8">
+
+    <div class="max-w-7xl mx-auto">
+
+        <!-- ==================== HEADER ==================== -->
+        <header class="text-center mb-8">
+            <div class="top-gradient text-white py-8 px-6 rounded-2xl shadow-lg mb-4">
+                <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight">Video Presentation: My Technical Skills</h1>
+                <p class="mt-2 text-lg text-orange-100">3° Medio — Evaluacion Sumativa — Unidad 1</p>
+                <p class="mt-1 text-sm text-orange-200">Liceo Tecnico Profesional — Todas las Especialidades</p>
+            </div>
+            <p class="text-orange-800 text-sm">Organiza tus evaluaciones por curso. El progreso se guarda automaticamente en tu navegador.</p>
+        </header>
+
+        <!-- ==================== INSTRUCTIONS ==================== -->
+        <div class="mb-8 instruction-section rounded-xl overflow-hidden no-print">
+            <button id="toggleInstructions" class="w-full flex items-center justify-between p-5 text-left hover:bg-orange-100/50 transition-colors">
+                <div class="flex items-center space-x-3">
+                    <span class="text-2xl">&#128203;</span>
+                    <span class="font-bold text-orange-900 text-lg">Instrucciones del Video / Video Assessment Instructions (clic para expandir)</span>
+                </div>
+                <span id="instructionsIcon" class="text-orange-600 text-xl font-bold transition-transform duration-300">&#9654;</span>
+            </button>
+            <div id="instructionsContent" class="px-6 pb-6 hidden">
+
+                <!-- Spanish Instructions -->
+                <div class="mb-6 bg-white p-5 rounded-lg shadow-sm border border-orange-200">
+                    <h3 class="text-lg font-bold text-orange-900 mb-3 border-b border-orange-200 pb-2">&#127466;&#127480; Instrucciones en Espanol</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm text-orange-950">
+                        <div>
+                            <h4 class="font-bold mb-2 text-orange-800">Que debo presentar?</h4>
+                            <p class="mb-2">Debes realizar un <strong>video individual en ingles</strong> sobre tus habilidades tecnicas en tu especialidad. El titulo de tu presentacion es:</p>
+                            <p class="text-center font-bold text-orange-700 bg-orange-50 p-2 rounded mb-3">"My Technical Skills in [tu Especialidad]"</p>
+                            <ul class="list-disc list-inside space-y-1">
+                                <li>Describe <strong>3 herramientas o equipos</strong> que sabes usar</li>
+                                <li>Explica <strong>2 sistemas o procesos</strong> que conoces</li>
+                                <li>Argumenta <strong>por que tu especialidad es importante</strong> para la sociedad</li>
+                            </ul>
+                            <div class="mt-3 bg-orange-50 p-3 rounded border-l-4 border-orange-400">
+                                <strong>IMPORTANTE:</strong> Tu video DEBE incluir subtitulos en ingles. Los subtitulos deben reflejar exactamente lo que dices. Esto permite evaluar tu produccion escrita.
+                            </div>
+                        </div>
+                        <div>
+                            <h4 class="font-bold mb-2 text-orange-800">Estructura obligatoria:</h4>
+                            <div class="space-y-2">
+                                <div class="bg-orange-50 p-3 rounded border-l-4 border-orange-400">
+                                    <strong>1. Introduction:</strong> Tu nombre, tu especialidad, por que la elegiste
+                                </div>
+                                <div class="bg-orange-50 p-3 rounded border-l-4 border-orange-400">
+                                    <strong>2. Body:</strong> 3 herramientas/equipos que usas + 2 sistemas/procesos que conoces
+                                </div>
+                                <div class="bg-orange-50 p-3 rounded border-l-4 border-orange-400">
+                                    <strong>3. Conclusion:</strong> Por que tu especialidad es importante para la sociedad
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-6 text-sm text-orange-950">
+                        <div>
+                            <h4 class="font-bold mb-2 text-orange-800">Detalles importantes:</h4>
+                            <ul class="list-disc list-inside space-y-1">
+                                <li><strong>Duracion del video:</strong> 2 a 3 minutos</li>
+                                <li><strong>Fecha:</strong> Miercoles 22 / Jueves 23 de abril de 2026</li>
+                                <li><strong>Puntaje maximo:</strong> 24 puntos (6 criterios x 4 pts)</li>
+                                <li><strong>Exigencia:</strong> 60% (14.4 pts para nota 4.0)</li>
+                                <li>Puedes usar <strong>apoyo visual</strong> (imagenes, diagramas, objetos reales)</li>
+                                <li><strong>NO</strong> puedes leer un texto escrito completo (si puedes usar tarjetas con palabras clave)</li>
+                                <li>Enviar el video por el medio indicado por el profesor (Google Classroom, correo, USB, etc.)</li>
+                                <li>Tu video debe incluir <strong>subtitulos en ingles</strong> (esto se evalua como criterio adicional)</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="font-bold mb-2 text-orange-800">Tips para grabar bien tu video:</h4>
+                            <ul class="list-disc list-inside space-y-1">
+                                <li>Graba en un lugar con buena iluminacion y poco ruido de fondo</li>
+                                <li>Puedes usar tarjetas con palabras clave (no texto completo)</li>
+                                <li>Habla claro, a buen volumen, y mira a la camara</li>
+                                <li>Puedes editar tu video, pero NO uses texto en pantalla que reemplace tu discurso oral</li>
+                                <li>Usa vocabulario tecnico de tu especialidad en ingles</li>
+                                <li>Revisa que el video se escuche y vea bien antes de enviarlo</li>
+                                <li>Puedes usar apoyo visual (imagenes, diagramas, objetos reales) mostrandolos a la camara</li>
+                                <li>Agrega subtitulos en ingles. Revisa la ortografia y gramatica de los subtitulos</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- English Instructions -->
+                <div class="mb-6 bg-white p-5 rounded-lg shadow-sm border border-orange-200">
+                    <h3 class="text-lg font-bold text-orange-900 mb-3 border-b border-orange-200 pb-2">&#127468;&#127463; Instructions in English</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm text-orange-950">
+                        <div>
+                            <h4 class="font-bold mb-2 text-orange-800">What do I present?</h4>
+                            <p class="mb-2">You must record an <strong>individual video presentation in English</strong> about your technical skills in your specialty:</p>
+                            <p class="text-center font-bold text-orange-700 bg-orange-50 p-2 rounded mb-3">"My Technical Skills in [your Specialty]"</p>
+                            <ul class="list-disc list-inside space-y-1">
+                                <li>Describe <strong>3 tools or equipment</strong> you know how to use</li>
+                                <li>Explain <strong>2 systems or processes</strong> you understand</li>
+                                <li>Argue <strong>why your specialty is important</strong> for society</li>
+                            </ul>
+                            <div class="mt-3 bg-orange-50 p-3 rounded border-l-4 border-orange-400">
+                                <strong>IMPORTANT:</strong> Your video MUST include English subtitles that accurately reflect what you say.
+                            </div>
+                        </div>
+                        <div>
+                            <h4 class="font-bold mb-2 text-orange-800">Required structure:</h4>
+                            <div class="space-y-2">
+                                <div class="bg-orange-50 p-3 rounded border-l-4 border-orange-400">
+                                    <strong>1. Introduction:</strong> Your name, your specialty, why you chose it
+                                </div>
+                                <div class="bg-orange-50 p-3 rounded border-l-4 border-orange-400">
+                                    <strong>2. Body:</strong> 3 tools/equipment you use + 2 systems/processes you know
+                                </div>
+                                <div class="bg-orange-50 p-3 rounded border-l-4 border-orange-400">
+                                    <strong>3. Conclusion:</strong> Why your specialty is important for society
+                                </div>
+                            </div>
+                            <div class="mt-3 p-3 bg-amber-50 border border-amber-300 rounded text-amber-900">
+                                <strong>Video duration:</strong> 2-3 minutes | <strong>Date:</strong> April 22 (Wed) / April 23 (Thu) 2026<br>
+                                <strong>You can use:</strong> note cards, images, diagrams | <strong>You cannot:</strong> read a full script or use on-screen text to replace speech<br>
+                                <strong>Submit:</strong> via method indicated by teacher (Google Classroom, email, USB, etc.)<br>
+                                <strong>Subtitles:</strong> Required (English)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Rubric Preview -->
+                <div class="bg-white p-5 rounded-lg shadow-sm border border-orange-200">
+                    <h3 class="text-lg font-bold text-orange-900 mb-3 border-b border-orange-200 pb-2">Rubrica / Rubric (6 criterios x 4 pts = 24 pts max | 14.4 pts = nota 4.0)</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm border-collapse">
+                            <thead>
+                                <tr class="bg-orange-100 text-orange-900">
+                                    <th class="border border-orange-200 p-2 text-left">Criterio / Criterion</th>
+                                    <th class="border border-orange-200 p-2 text-center">Insuficiente (1)</th>
+                                    <th class="border border-orange-200 p-2 text-center">Suficiente (2)</th>
+                                    <th class="border border-orange-200 p-2 text-center">Bueno (3)</th>
+                                    <th class="border border-orange-200 p-2 text-center">Excelente (4)</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-orange-950 text-xs">
+                                <tr><td class="border border-orange-200 p-2 font-semibold text-sm">Content / Contenido</td><td class="border border-orange-200 p-2">Missing most required elements</td><td class="border border-orange-200 p-2">Some elements present but incomplete</td><td class="border border-orange-200 p-2">Most elements covered (tools, systems, importance)</td><td class="border border-orange-200 p-2">All elements fully covered with detail</td></tr>
+                                <tr><td class="border border-orange-200 p-2 font-semibold text-sm">Technical Vocabulary / Vocabulario Tecnico</td><td class="border border-orange-200 p-2">No technical terms used</td><td class="border border-orange-200 p-2">1-2 terms, some errors</td><td class="border border-orange-200 p-2">3-4 correct technical terms</td><td class="border border-orange-200 p-2">5+ terms used naturally and accurately</td></tr>
+                                <tr><td class="border border-orange-200 p-2 font-semibold text-sm">Pronunciation / Pronunciacion</td><td class="border border-orange-200 p-2">Very hard to understand</td><td class="border border-orange-200 p-2">Understandable with effort</td><td class="border border-orange-200 p-2">Mostly clear pronunciation</td><td class="border border-orange-200 p-2">Clear, accurate, natural</td></tr>
+                                <tr><td class="border border-orange-200 p-2 font-semibold text-sm">Fluency / Fluidez</td><td class="border border-orange-200 p-2">Constant stops, reads everything. Video quality too poor to evaluate.</td><td class="border border-orange-200 p-2">Frequent pauses, hesitant. Video has some quality issues.</td><td class="border border-orange-200 p-2">Reasonable flow, some pauses. Good video quality, clear audio.</td><td class="border border-orange-200 p-2">Natural rhythm, confident delivery. Excellent video and audio quality.</td></tr>
+                                <tr><td class="border border-orange-200 p-2 font-semibold text-sm">Structure / Estructura</td><td class="border border-orange-200 p-2">No clear organization</td><td class="border border-orange-200 p-2">Attempts structure but unclear</td><td class="border border-orange-200 p-2">Has intro-body-conclusion</td><td class="border border-orange-200 p-2">Clear, well-organized with transitions</td></tr>
+                                <tr><td class="border border-orange-200 p-2 font-semibold text-sm">Subtitles / Subtitulos</td><td class="border border-orange-200 p-2">No subtitles, or in Spanish/incomprehensible</td><td class="border border-orange-200 p-2">English subtitles with frequent errors</td><td class="border border-orange-200 p-2">Subtitles mostly accurate, minor errors</td><td class="border border-orange-200 p-2">Accurate, well-synced subtitles with good spelling/grammar</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="mt-3 flex flex-wrap gap-3 text-xs">
+                        <span class="specialty-badge specialty-industrial">3°A: Mec. Industrial</span>
+                        <span class="specialty-badge specialty-automotriz">3°B: Mec. Automotriz</span>
+                        <span class="specialty-badge specialty-electricidad">3°C: Electricidad</span>
+                        <span class="specialty-badge specialty-grafica">3°D: Gráfica</span>
+                        <span class="specialty-badge specialty-electronica">3°E: Electrónica</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== TOOLBAR ==================== -->
+        <div class="mb-8 p-4 bg-white rounded-lg shadow-md border border-orange-200 flex flex-col sm:flex-row justify-center items-center space-y-3 sm:space-y-0 sm:space-x-3 no-print flex-wrap gap-y-3">
+            <select id="courseSelector" class="border-2 border-orange-300 rounded-lg px-4 py-2 font-semibold text-orange-900 bg-orange-50 focus:outline-none focus:ring-2 focus:ring-orange-400 w-full sm:w-auto">
+                <option value="">-- Seleccionar Curso --</option>
+                <option value="3A">3°A — Mec. Industrial</option>
+                <option value="3B">3°B — Mec. Automotriz</option>
+                <option value="3C">3°C — Electricidad</option>
+                <option value="3D">3°D — Gráfica</option>
+                <option value="3E">3°E — Electrónica</option>
+            </select>
+            <button id="exportBtn" class="bg-emerald-600 text-white font-bold py-2 px-5 rounded-lg hover:bg-emerald-700 transition-colors shadow-sm w-full sm:w-auto text-sm">
+                Exportar JSON
+            </button>
+            <label class="bg-blue-600 text-white font-bold py-2 px-5 rounded-lg hover:bg-blue-700 transition-colors shadow-sm w-full sm:w-auto cursor-pointer text-center text-sm">
+                Importar JSON<input type="file" id="importInput" accept=".json" class="hidden">
+            </label>
+            <button id="exportExcelBtn" class="bg-teal-600 text-white font-bold py-2 px-5 rounded-lg hover:bg-teal-700 transition-colors shadow-sm w-full sm:w-auto text-sm">
+                Exportar Excel
+            </button>
+            <button id="clearDataBtn" class="bg-red-600 text-white font-bold py-2 px-5 rounded-lg hover:bg-red-700 transition-colors shadow-sm w-full sm:w-auto text-sm">
+                Limpiar Datos
+            </button>
+        </div>
+
+        <!-- ==================== COURSE VIEW ==================== -->
+        <div id="courseView" class="hidden">
+            <!-- Course Header -->
+            <div id="courseHeader" class="bg-white p-6 rounded-xl shadow-lg border-t-4 border-orange-600 mb-6 fade-in">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4">
+                    <div>
+                        <div class="flex items-center space-x-3 flex-wrap gap-y-2">
+                            <h2 id="courseTitle" class="text-3xl font-extrabold text-orange-900"></h2>
+                            <span id="specialtyBadge" class="specialty-badge"></span>
+                        </div>
+                        <p id="courseStats" class="text-sm text-orange-600 mt-1"></p>
+                    </div>
+                    <div class="flex items-center space-x-3 mt-3 sm:mt-0 no-print">
+                        <label class="bg-orange-100 text-orange-800 font-semibold px-4 py-2 rounded-lg hover:bg-orange-200 transition-colors text-sm cursor-pointer border border-orange-300">
+                            Cargar Lista Excel<input type="file" id="excelUploadInput" accept=".xlsx,.xls,.csv" class="hidden">
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Add Student Section -->
+                <div class="bg-orange-50 p-4 rounded-lg border border-orange-200 no-print">
+                    <h4 class="font-semibold text-orange-800 mb-2 text-sm">Agregar Estudiante al Curso:</h4>
+                    <div class="flex flex-col sm:flex-row items-stretch sm:items-center space-y-2 sm:space-y-0 sm:space-x-2">
+                        <input type="text" id="newStudentInput" class="flex-grow border-2 border-orange-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400" placeholder="Escribe el nombre completo del estudiante...">
+                        <button id="addStudentBtn" class="bg-orange-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-orange-700 transition-colors shadow-sm text-sm whitespace-nowrap">
+                            + Agregar Estudiante
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Course Progress Bar -->
+                <div class="mt-4">
+                    <div class="flex justify-between text-xs text-orange-700 mb-1">
+                        <span id="progressLabel">Progreso: 0 / 0 evaluados</span>
+                        <span id="progressPercent">0%</span>
+                    </div>
+                    <div class="w-full bg-orange-100 rounded-full h-3">
+                        <div id="progressBar" class="bg-gradient-to-r from-orange-500 to-amber-500 h-3 rounded-full transition-all duration-500" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <!-- Course Summary -->
+                <div class="mt-4 p-3 bg-orange-50 rounded-lg border border-orange-200 flex flex-wrap gap-6 items-center justify-center text-sm">
+                    <div class="text-orange-700"><span class="font-semibold">Evaluados:</span> <span id="summaryEvaluated" class="font-bold text-orange-900">0</span></div>
+                    <div class="text-orange-700"><span class="font-semibold">Promedio:</span> <span id="summaryAvg" class="font-bold text-orange-900">-</span></div>
+                    <div class="text-orange-700"><span class="font-semibold">Aprobacion:</span> <span id="summaryPass" class="font-bold text-orange-900">-</span></div>
+                </div>
+            </div>
+
+            <!-- Students Container -->
+            <div id="studentsContainer" class="space-y-4"></div>
+        </div>
+
+        <!-- No course selected message -->
+        <div id="noCourseMsg" class="text-center py-16">
+            <div class="text-6xl mb-4 opacity-40">&#127891;</div>
+            <h3 class="text-xl font-bold text-orange-800 mb-2">Selecciona un curso para comenzar</h3>
+            <p class="text-orange-600 text-sm">Elige uno de los cursos 3°A a 3°E en el selector de arriba.</p>
+            <div class="mt-6 flex flex-wrap gap-3 justify-center text-xs">
+                <span class="specialty-badge specialty-industrial">3°A: Mec. Industrial</span>
+                <span class="specialty-badge specialty-automotriz">3°B: Mec. Automotriz</span>
+                <span class="specialty-badge specialty-electricidad">3°C: Electricidad</span>
+                <span class="specialty-badge specialty-grafica">3°D: Gráfica</span>
+                <span class="specialty-badge specialty-electronica">3°E: Electrónica</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const { jsPDF } = window.jspdf;
+        const STORAGE_KEY = 'eval3roMedio_TechnicalSkills_video_v2';
+
+        // Course-Specialty mapping
+        const courseSpecialties = {
+            '3A': { name: 'Mec. Industrial', cssClass: 'specialty-industrial', english: 'Industrial' },
+            '3B': { name: 'Mec. Automotriz', cssClass: 'specialty-automotriz', english: 'Automotive' },
+            '3C': { name: 'Electricidad', cssClass: 'specialty-electricidad', english: 'Electrical' },
+            '3D': { name: 'Gráfica', cssClass: 'specialty-grafica', english: 'Graphic Design' },
+            '3E': { name: 'Electrónica', cssClass: 'specialty-electronica', english: 'Electronics' }
+        };
+
+        // Student database — students are added via the UI or imported from Excel
+        // Empty arrays: students must be added manually or loaded from file
+        const studentDatabase = {
+            '3A': [], // Mec. Industrial
+            '3B': [], // Mec. Automotriz
+            '3C': [], // Electricidad
+            '3D': [], // Gráfica
+            '3E': []  // Electrónica
+        };
+
+        // Rubric: 6 criteria x 4 levels = 24 pts max. Exigencia 60% (14.4 pts = nota 4.0)
+        const rubricStructure = [
+            {
+                id: 'content',
+                name: 'Content / Contenido',
+                shortName: 'Content',
+                descriptions: {
+                    1: 'Does not mention tools, systems, or importance of specialty. Content missing or irrelevant. / No menciona herramientas, sistemas ni importancia. Contenido ausente o irrelevante a la especialidad.',
+                    2: 'Mentions 1-2 tools OR 1 system but lacks depth. Does not explain importance. / Menciona 1-2 herramientas O 1 sistema pero sin profundidad. No explica la importancia de la especialidad.',
+                    3: 'Mentions 2-3 tools AND 1-2 systems. Briefly explains importance. Mostly complete. / Menciona 2-3 herramientas Y 1-2 sistemas. Explica brevemente la importancia. Mayormente completo.',
+                    4: 'Clearly describes 3 tools, 2 systems, and gives a convincing argument for importance. Complete and detailed. / Describe claramente 3 herramientas, 2 sistemas y argumenta convincentemente la importancia. Completo y detallado.'
+                }
+            },
+            {
+                id: 'vocabulary',
+                name: 'Technical Vocabulary / Vocabulario Tecnico',
+                shortName: 'Tech. Vocab.',
+                descriptions: {
+                    1: 'No technical vocabulary. Only basic/general English words or uses Spanish for technical terms. / No usa vocabulario tecnico. Solo palabras basicas o usa espanol para terminos tecnicos.',
+                    2: 'Uses 1-2 technical terms but with errors or out of context. Limited range. / Usa 1-2 terminos tecnicos pero con errores o fuera de contexto. Rango limitado.',
+                    3: 'Uses 3-4 technical terms correctly and in context. Good use of specialty language. / Usa 3-4 terminos tecnicos correctamente y en contexto. Buen uso del lenguaje de especialidad.',
+                    4: 'Uses 5+ technical terms accurately and naturally. Strong command of specialty vocabulary. / Usa 5+ terminos tecnicos de forma precisa y natural. Excelente dominio del vocabulario de especialidad.'
+                }
+            },
+            {
+                id: 'pronunciation',
+                name: 'Pronunciation / Pronunciacion',
+                shortName: 'Pronunciation',
+                descriptions: {
+                    1: 'Very difficult to understand. Most words are mispronounced. / Muy dificil de entender. La mayoria de las palabras estan mal pronunciadas.',
+                    2: 'Understandable with effort. Several key words and technical terms mispronounced. / Comprensible con esfuerzo. Varias palabras clave y terminos tecnicos mal pronunciados.',
+                    3: 'Mostly clear and understandable. Minor errors that do not impede communication. / Mayormente clara y comprensible. Errores menores que no impiden la comunicacion.',
+                    4: 'Clear, accurate, and natural pronunciation. Technical terms well-pronounced. / Pronunciacion clara, precisa y natural. Terminos tecnicos bien pronunciados.'
+                }
+            },
+            {
+                id: 'fluency',
+                name: 'Fluency / Fluidez',
+                shortName: 'Fluency',
+                descriptions: {
+                    1: 'Reads everything from paper/phone. Constant stops. No natural delivery. Video quality too poor to evaluate. / Lee todo de un papel/celular. Paradas constantes. Sin entrega natural. Calidad del video es muy pobre para evaluar.',
+                    2: 'Frequent long pauses. Relies heavily on notes. Hesitant. Little natural flow. Video has some quality issues. / Pausas largas frecuentes. Depende mucho de notas. Vacilante. Poca fluidez natural. El video tiene algunos problemas de calidad.',
+                    3: 'Reasonable fluency with some natural pauses. Uses notes only as support. Maintains communication. Good video quality, clear audio. / Fluidez razonable con pausas naturales. Usa notas solo como apoyo. Mantiene la comunicacion. Buena calidad de video y audio claro.',
+                    4: 'Natural rhythm and confidence. Minimal pauses. Engages camera with eye contact. Excellent video and audio quality. / Ritmo natural y confianza. Pausas minimas. Conecta con la camara con contacto visual. Excelente calidad de video y audio.'
+                }
+            },
+            {
+                id: 'structure',
+                name: 'Structure / Estructura',
+                shortName: 'Structure',
+                descriptions: {
+                    1: 'No clear organization. Jumps between topics. No introduction or conclusion. / Sin organizacion clara. Salta entre temas. Sin introduccion ni conclusion.',
+                    2: 'Attempts structure but unclear. Has intro OR conclusion but not both. Disorganized ideas. / Intenta seguir estructura pero es confusa. Tiene intro O conclusion pero no ambas. Ideas desordenadas.',
+                    3: 'Recognizable introduction, body, and conclusion. Ideas flow in mostly logical order. / Introduccion, cuerpo y conclusion reconocibles. Ideas fluyen en orden mayormente logico.',
+                    4: 'Clear, well-organized: strong intro, detailed body, impactful conclusion. Smooth transitions. / Clara y bien organizada: intro fuerte, cuerpo detallado, conclusion impactante. Transiciones fluidas.'
+                }
+            },
+            {
+                id: 'subtitles',
+                name: 'Subtitles / Subtitulos',
+                shortName: 'Subtitles',
+                descriptions: {
+                    1: 'No subtitles included, or subtitles are in Spanish / incomprehensible. Cannot evaluate written production. / Sin subtitulos, o subtitulos en espanol / incomprensibles. No se puede evaluar produccion escrita.',
+                    2: 'English subtitles present but with frequent spelling/grammar errors or poor sync with speech. / Subtitulos en ingles pero con errores frecuentes de ortografia/gramatica o mala sincronizacion con el discurso.',
+                    3: 'English subtitles mostly accurate and well-synced. Minor spelling or grammar errors. / Subtitulos en ingles mayormente precisos y sincronizados. Errores menores de ortografia o gramatica.',
+                    4: 'Accurate, well-synchronized English subtitles with correct spelling, grammar, and punctuation throughout. / Subtitulos en ingles precisos, bien sincronizados, con ortografia, gramatica y puntuacion correcta.'
+                }
+            }
+        ];
+
+        const MAX_SCORE = rubricStructure.length * 4; // 24
+
+        let allData = {};
+        let currentCourse = '';
+
+        // ==================== INITIALIZATION ====================
+        function loadData() {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (saved) {
+                allData = JSON.parse(saved);
+            }
+            // Ensure all courses exist in data
+            Object.keys(courseSpecialties).forEach(course => {
+                if (!allData[course]) {
+                    allData[course] = { students: [], studentCounter: 0 };
+                }
+            });
+            saveData();
+        }
+
+        function saveData() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(allData));
+        }
+
+        // ==================== INSTRUCTIONS TOGGLE ====================
+        document.getElementById('toggleInstructions').addEventListener('click', () => {
+            const content = document.getElementById('instructionsContent');
+            const icon = document.getElementById('instructionsIcon');
+            content.classList.toggle('hidden');
+            icon.style.transform = content.classList.contains('hidden') ? 'rotate(0deg)' : 'rotate(90deg)';
+        });
+
+        // ==================== COURSE SELECTOR ====================
+        document.getElementById('courseSelector').addEventListener('change', (e) => {
+            currentCourse = e.target.value;
+            if (currentCourse) {
+                document.getElementById('noCourseMsg').classList.add('hidden');
+                document.getElementById('courseView').classList.remove('hidden');
+                renderCourse();
+            } else {
+                document.getElementById('noCourseMsg').classList.remove('hidden');
+                document.getElementById('courseView').classList.add('hidden');
+            }
+        });
+
+        // ==================== RENDER COURSE ====================
+        function renderCourse() {
+            if (!currentCourse) return;
+            const courseData = allData[currentCourse];
+            const specialty = courseSpecialties[currentCourse];
+
+            // Header
+            document.getElementById('courseTitle').textContent = `3°${currentCourse.slice(-1)}`;
+            const badge = document.getElementById('specialtyBadge');
+            badge.textContent = specialty.name + ' (' + specialty.english + ')';
+            badge.className = `specialty-badge ${specialty.cssClass}`;
+
+            // Stats
+            const total = courseData.students.length;
+            const evaluated = courseData.students.filter(s => Object.keys(s.scores).length === rubricStructure.length).length;
+            document.getElementById('courseStats').textContent = `${total} estudiante(s) registrado(s) | Video: "My ${specialty.english} Skills"`;
+
+            updateProgress();
+            updateSummary();
+            renderStudents();
+        }
+
+        function updateProgress() {
+            if (!currentCourse) return;
+            const courseData = allData[currentCourse];
+            const total = courseData.students.length;
+            const evaluated = courseData.students.filter(s => Object.keys(s.scores).length === rubricStructure.length).length;
+            const percent = total > 0 ? Math.round((evaluated / total) * 100) : 0;
+            document.getElementById('progressLabel').textContent = `Progreso: ${evaluated} / ${total} evaluados`;
+            document.getElementById('progressPercent').textContent = `${percent}%`;
+            document.getElementById('progressBar').style.width = `${percent}%`;
+        }
+
+        function updateSummary() {
+            if (!currentCourse) return;
+            const courseData = allData[currentCourse];
+            let totalGrades = 0, gradeSum = 0, passCount = 0;
+            courseData.students.forEach(student => {
+                const scoredCount = Object.keys(student.scores).length;
+                if (scoredCount > 0) {
+                    const totalScore = Object.values(student.scores).reduce((sum, s) => sum + (s || 0), 0);
+                    const grade = calculateGrade(totalScore, MAX_SCORE, 0.60);
+                    totalGrades++;
+                    gradeSum += grade;
+                    if (grade >= 4.0) passCount++;
+                }
+            });
+            document.getElementById('summaryEvaluated').textContent = totalGrades;
+            document.getElementById('summaryAvg').textContent = totalGrades > 0 ? (gradeSum / totalGrades).toFixed(1) : '-';
+            document.getElementById('summaryPass').textContent = totalGrades > 0 ? `${Math.round(passCount / totalGrades * 100)}% (${passCount}/${totalGrades})` : '-';
+        }
+
+        function renderStudents() {
+            const container = document.getElementById('studentsContainer');
+            container.innerHTML = '';
+            const courseData = allData[currentCourse];
+
+            if (courseData.students.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-12 bg-white rounded-xl shadow-md border border-orange-200">
+                        <div class="text-5xl mb-3 opacity-30">&#128100;</div>
+                        <p class="text-orange-700 font-semibold">No hay estudiantes en este curso</p>
+                        <p class="text-orange-500 text-sm mt-1">Agrega estudiantes con el campo de arriba o carga una lista desde Excel.</p>
+                    </div>`;
+                return;
+            }
+
+            courseData.students.forEach((student, index) => {
+                const html = createStudentCard(student, index);
+                container.insertAdjacentHTML('beforeend', html);
+                updateStudentUI(student.id);
+            });
+        }
+
+        function createStudentCard(student, index) {
+            const isOpen = student.isOpen === true;
+            const scoredCount = Object.keys(student.scores).length;
+            const isEvaluated = scoredCount === rubricStructure.length;
+            const totalScore = Object.values(student.scores).reduce((sum, s) => sum + (s || 0), 0);
+            const grade = calculateGrade(totalScore, MAX_SCORE, 0.60);
+            const specialty = courseSpecialties[currentCourse];
+
+            const statusBadge = isEvaluated
+                ? '<span class="status-badge status-evaluated">Evaluado</span>'
+                : '<span class="status-badge status-pending">Pendiente</span>';
+
+            const gradePreview = scoredCount > 0
+                ? `<span class="text-sm font-bold ${grade >= 4.0 ? 'text-green-600' : 'text-red-600'} ml-2">${grade.toFixed(1)}</span>`
+                : '';
+
+            let rubricHTML = `<thead class="text-sm"><tr class="bg-orange-50 text-orange-900">
+                <th class="p-3 text-left font-semibold">Criterion / Criterio</th>
+                <th class="p-3 text-center font-semibold">Insuficiente (1)</th>
+                <th class="p-3 text-center font-semibold">Suficiente (2)</th>
+                <th class="p-3 text-center font-semibold">Bueno (3)</th>
+                <th class="p-3 text-center font-semibold">Excelente (4)</th>
+            </tr></thead><tbody>`;
+
+            rubricStructure.forEach(criterion => {
+                rubricHTML += `<tr data-criterion-id="${criterion.id}">
+                    <td class="font-semibold text-orange-900 text-sm">${criterion.name}</td>
+                    <td class="score-cell score-1" data-score="1">${criterion.descriptions[1]}</td>
+                    <td class="score-cell score-2" data-score="2">${criterion.descriptions[2]}</td>
+                    <td class="score-cell score-3" data-score="3">${criterion.descriptions[3]}</td>
+                    <td class="score-cell score-4" data-score="4">${criterion.descriptions[4]}</td>
+                </tr>`;
+            });
+            rubricHTML += '</tbody>';
+
+            return `
+                <div id="student-${student.id}" class="student-card bg-white rounded-xl shadow-md border-l-4 border-orange-500 ${isOpen ? 'is-open' : ''} fade-in" data-student-id="${student.id}">
+                    <div class="student-header-trigger flex justify-between items-center cursor-pointer p-4 sm:p-5 hover:bg-orange-50/60 transition-colors rounded-t-xl">
+                        <div class="flex items-center space-x-3 flex-wrap gap-y-1">
+                            <span class="header-icon text-orange-400 text-lg font-bold">&#9654;</span>
+                            <span class="text-xs text-orange-400 font-mono">#${index + 1}</span>
+                            <h3 class="text-lg font-bold text-orange-900">${student.name}</h3>
+                            ${statusBadge}
+                            ${gradePreview}
+                        </div>
+                        <button class="delete-student-btn text-red-400 hover:text-red-600 font-semibold text-sm z-10 relative no-print" data-student-id="${student.id}">Eliminar</button>
+                    </div>
+                    <div class="collapsible-content">
+                        <div class="px-4 sm:px-5 pb-5">
+                            <!-- Specialty Context -->
+                            <div class="mb-4 bg-orange-50 p-3 rounded-lg text-sm text-orange-800 border border-orange-200">
+                                <strong>Especialidad:</strong> ${specialty.name} (${specialty.english}) &nbsp;|&nbsp;
+                                <strong>Video:</strong> "My ${specialty.english} Skills" &nbsp;|&nbsp;
+                                <strong>Video:</strong> 2-3 min &nbsp;|&nbsp;
+                                <strong>Fecha:</strong> 22-23 Abril 2026
+                            </div>
+
+                            <!-- Rubric Table -->
+                            <div class="overflow-x-auto mb-6">
+                                <table class="rubric-table w-full border-collapse">${rubricHTML}</table>
+                            </div>
+
+                            <!-- Feedback -->
+                            <div class="mb-6">
+                                <h4 class="font-semibold text-orange-800 mb-2 text-sm">Retroalimentacion / Feedback:</h4>
+                                <textarea class="feedback-textarea w-full border-2 border-orange-200 rounded-lg p-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 bg-orange-50/30" rows="3" placeholder="Escribe aqui la retroalimentacion para el estudiante...">${student.feedback || ''}</textarea>
+                            </div>
+
+                            <!-- Results Bar -->
+                            <div class="p-4 bg-gradient-to-r from-orange-50 to-amber-50 rounded-xl border border-orange-200 flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0 sm:space-x-8">
+                                <button class="download-pdf-btn bg-orange-600 text-white font-bold py-2.5 px-6 rounded-lg hover:bg-orange-700 transition-colors shadow-sm no-print text-sm" data-student-id="${student.id}">
+                                    Descargar PDF
+                                </button>
+                                <div class="flex space-x-8">
+                                    <div class="text-center">
+                                        <p class="text-xs font-medium text-orange-600 uppercase tracking-wide">Puntaje Total</p>
+                                        <p class="total-score text-2xl font-extrabold text-orange-900">0 / ${MAX_SCORE}</p>
+                                    </div>
+                                    <div class="text-center">
+                                        <p class="text-xs font-medium text-orange-600 uppercase tracking-wide">Nota Final (60%)</p>
+                                        <p class="final-grade text-2xl font-extrabold text-orange-600">1.0</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+        }
+
+        function updateStudentUI(studentId) {
+            const courseData = allData[currentCourse];
+            const student = courseData.students.find(s => s.id === studentId);
+            if (!student) return;
+            const card = document.getElementById(`student-${studentId}`);
+            if (!card) return;
+
+            card.querySelectorAll('tr[data-criterion-id]').forEach(row => {
+                const criterionId = row.dataset.criterionId;
+                const savedScore = student.scores[criterionId];
+                row.querySelectorAll('.score-cell').forEach(cell => {
+                    cell.classList.remove('selected', 'unselected-sibling');
+                    if (savedScore) {
+                        if (parseInt(cell.dataset.score) === savedScore) {
+                            cell.classList.add('selected');
+                        } else {
+                            cell.classList.add('unselected-sibling');
+                        }
+                    }
+                });
+            });
+            calculateResults(studentId);
+        }
+
+        function calculateResults(studentId) {
+            const courseData = allData[currentCourse];
+            const student = courseData.students.find(s => s.id === studentId);
+            if (!student) return;
+
+            const totalScore = Object.values(student.scores).reduce((sum, s) => sum + (s || 0), 0);
+            const grade = calculateGrade(totalScore, MAX_SCORE, 0.60);
+
+            const card = document.getElementById(`student-${studentId}`);
+            if (!card) return;
+            card.querySelector('.total-score').textContent = `${totalScore} / ${MAX_SCORE}`;
+            const gradeEl = card.querySelector('.final-grade');
+            gradeEl.textContent = grade.toFixed(1);
+            gradeEl.className = `final-grade text-2xl font-extrabold ${grade >= 4.0 ? 'text-green-600' : 'text-red-600'}`;
+        }
+
+        function calculateGrade(score, maxScore, exigency) {
+            if (score === null || score === undefined || score === 0) return 1.0;
+            const passingScore = maxScore * exigency;
+            let grade;
+            if (score >= passingScore) {
+                grade = 4.0 + 3.0 * ((score - passingScore) / (maxScore - passingScore));
+            } else {
+                if (passingScore === 0) return 7.0;
+                grade = 1.0 + 3.0 * (score / passingScore);
+            }
+            return Math.max(1.0, Math.min(7.0, grade));
+        }
+
+        // ==================== ADD STUDENT ====================
+        document.getElementById('addStudentBtn').addEventListener('click', () => {
+            const input = document.getElementById('newStudentInput');
+            const name = input.value.trim().toUpperCase();
+            if (!name) { alert('Ingresa un nombre.'); return; }
+            if (!currentCourse) { alert('Selecciona un curso primero.'); return; }
+
+            const courseData = allData[currentCourse];
+            if (courseData.students.some(s => s.name === name)) {
+                alert('Ya existe un estudiante con ese nombre en este curso.');
+                return;
+            }
+
+            courseData.studentCounter++;
+            const newStudent = {
+                id: Date.now(),
+                name: name,
+                scores: {},
+                feedback: '',
+                isOpen: false
+            };
+            courseData.students.push(newStudent);
+            courseData.students.sort((a, b) => a.name.localeCompare(b.name));
+            saveData();
+            renderCourse();
+            input.value = '';
+            // Scroll to the new student
+            setTimeout(() => {
+                const el = document.getElementById(`student-${newStudent.id}`);
+                if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 100);
+        });
+
+        document.getElementById('newStudentInput').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                document.getElementById('addStudentBtn').click();
+            }
+        });
+
+        // ==================== EXCEL UPLOAD ====================
+        document.getElementById('excelUploadInput').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file || !currentCourse) return;
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                try {
+                    const wb = XLSX.read(ev.target.result, { type: 'array' });
+                    const ws = wb.Sheets[wb.SheetNames[0]];
+                    const rows = XLSX.utils.sheet_to_json(ws, { header: 1 });
+                    const courseData = allData[currentCourse];
+                    let added = 0;
+                    rows.forEach(row => {
+                        const name = (row[0] || '').toString().trim().toUpperCase();
+                        if (!name || name === 'NOMBRE' || name === 'NAME' || name === 'ESTUDIANTE') return; // skip headers
+                        if (!courseData.students.some(s => s.name === name)) {
+                            courseData.studentCounter++;
+                            courseData.students.push({
+                                id: Date.now() + added,
+                                name: name,
+                                scores: {},
+                                feedback: '',
+                                isOpen: false
+                            });
+                            added++;
+                        }
+                    });
+                    courseData.students.sort((a, b) => a.name.localeCompare(b.name));
+                    saveData();
+                    renderCourse();
+                    alert(`Se cargaron ${added} estudiante(s) al curso 3°${currentCourse.slice(-1)}.`);
+                } catch (err) { alert('Error al leer archivo: ' + err.message); }
+            };
+            reader.readAsArrayBuffer(file);
+            e.target.value = '';
+        });
+
+        // ==================== EVENT DELEGATION ====================
+        document.getElementById('studentsContainer').addEventListener('click', (e) => {
+            const target = e.target;
+            const studentCard = target.closest('.student-card');
+            if (!studentCard) return;
+            const studentId = parseInt(studentCard.dataset.studentId);
+            const courseData = allData[currentCourse];
+            const student = courseData.students.find(s => s.id === studentId);
+            if (!student) return;
+
+            // Delete student button
+            if (target.matches('.delete-student-btn')) {
+                const sid = parseInt(target.dataset.studentId);
+                const st = courseData.students.find(s => s.id === sid);
+                if (st && confirm(`Eliminar a "${st.name}" del curso 3°${currentCourse.slice(-1)}?`)) {
+                    courseData.students = courseData.students.filter(s => s.id !== sid);
+                    saveData();
+                    renderCourse();
+                }
+                return;
+            }
+
+            // Toggle collapse
+            const headerTrigger = target.closest('.student-header-trigger');
+            if (headerTrigger && !target.matches('.delete-student-btn')) {
+                student.isOpen = !student.isOpen;
+                saveData();
+                studentCard.classList.toggle('is-open');
+                return;
+            }
+
+            // Score cell click
+            if (target.matches('.score-cell')) {
+                const criterionId = target.closest('tr').dataset.criterionId;
+                const score = parseInt(target.dataset.score);
+                student.scores[criterionId] = score;
+                updateStudentUI(studentId);
+                saveData();
+                updateProgress();
+                updateSummary();
+                return;
+            }
+
+            // PDF download
+            if (target.matches('.download-pdf-btn')) {
+                const sid = parseInt(target.dataset.studentId);
+                generatePDF(sid);
+                return;
+            }
+        });
+
+        // Feedback handler
+        document.getElementById('studentsContainer').addEventListener('input', (e) => {
+            if (e.target.matches('.feedback-textarea')) {
+                const studentCard = e.target.closest('.student-card');
+                const studentId = parseInt(studentCard.dataset.studentId);
+                const courseData = allData[currentCourse];
+                const student = courseData.students.find(s => s.id === studentId);
+                if (student) {
+                    student.feedback = e.target.value;
+                    saveData();
+                }
+            }
+        });
+
+        // ==================== EXPORT / IMPORT ====================
+        document.getElementById('exportBtn').addEventListener('click', () => {
+            const blob = new Blob([JSON.stringify(allData, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `respaldo_3roMedio_TechnicalSkills_${new Date().toISOString().slice(0, 10)}.json`;
+            document.body.appendChild(a); a.click(); document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        });
+
+        document.getElementById('importInput').addEventListener('change', (e) => {
+            const file = e.target.files[0]; if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                try {
+                    const data = JSON.parse(ev.target.result);
+                    if (!confirm('Importar datos? Se reemplazaran los datos actuales.')) return;
+                    allData = data;
+                    // Ensure all courses exist
+                    Object.keys(courseSpecialties).forEach(course => {
+                        if (!allData[course]) {
+                            allData[course] = { students: [], studentCounter: 0 };
+                        }
+                    });
+                    saveData();
+                    if (currentCourse) renderCourse();
+                    alert('Datos importados correctamente.');
+                } catch (err) { alert('Archivo no valido.'); }
+            };
+            reader.readAsText(file);
+            e.target.value = '';
+        });
+
+        document.getElementById('clearDataBtn').addEventListener('click', () => {
+            if (confirm('Estas seguro de que quieres borrar TODOS los datos de TODOS los cursos? Esta accion no se puede deshacer.')) {
+                localStorage.removeItem(STORAGE_KEY);
+                allData = {};
+                Object.keys(courseSpecialties).forEach(course => {
+                    allData[course] = { students: [], studentCounter: 0 };
+                });
+                saveData();
+                if (currentCourse) renderCourse();
+            }
+        });
+
+        // ==================== EXPORT EXCEL ====================
+        document.getElementById('exportExcelBtn').addEventListener('click', () => {
+            if (!currentCourse) { alert('Selecciona un curso primero.'); return; }
+            const courseData = allData[currentCourse];
+            const specialty = courseSpecialties[currentCourse];
+
+            const rows = [
+                [`Video Presentation: My Technical Skills - 3°${currentCourse.slice(-1)} (${specialty.name} / ${specialty.english})`],
+                ['Fecha: 22-23 Abril 2026 | Exigencia: 60% | Max: 24 pts'],
+                [],
+                ['#', 'Nombre Estudiante', ...rubricStructure.map(c => c.shortName), 'Puntaje', `/ ${MAX_SCORE}`, 'Nota']
+            ];
+
+            courseData.students.forEach((student, idx) => {
+                const scores = rubricStructure.map(c => student.scores[c.id] || '');
+                const total = Object.values(student.scores).reduce((sum, s) => sum + (s || 0), 0);
+                const grade = Object.keys(student.scores).length > 0 ? calculateGrade(total, MAX_SCORE, 0.60).toFixed(1) : '';
+                rows.push([idx + 1, student.name, ...scores, total || '', MAX_SCORE, grade]);
+            });
+
+            // Summary row
+            rows.push([]);
+            const evaluatedStudents = courseData.students.filter(s => Object.keys(s.scores).length > 0);
+            if (evaluatedStudents.length > 0) {
+                const avgGrade = evaluatedStudents.reduce((sum, s) => {
+                    const t = Object.values(s.scores).reduce((a, b) => a + (b||0), 0);
+                    return sum + calculateGrade(t, MAX_SCORE, 0.60);
+                }, 0) / evaluatedStudents.length;
+                const passCount = evaluatedStudents.filter(s => {
+                    const t = Object.values(s.scores).reduce((a, b) => a + (b||0), 0);
+                    return calculateGrade(t, MAX_SCORE, 0.60) >= 4.0;
+                }).length;
+                rows.push(['', 'RESUMEN', '', '', '', '', '', '', '']);
+                rows.push(['', `Evaluados: ${evaluatedStudents.length}`, '', '', '', '', '', `Promedio: ${avgGrade.toFixed(1)}`, '']);
+                rows.push(['', `Aprobados: ${passCount} (${Math.round(passCount/evaluatedStudents.length*100)}%)`, '', '', '', '', '', `Reprobados: ${evaluatedStudents.length - passCount}`, '']);
+            }
+
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.aoa_to_sheet(rows);
+            ws['!cols'] = [{ wch: 4 }, { wch: 42 }, ...rubricStructure.map(() => ({ wch: 13 })), { wch: 8 }, { wch: 5 }, { wch: 6 }];
+            XLSX.utils.book_append_sheet(wb, ws, `3${currentCourse.slice(-1)} ${specialty.name}`);
+            XLSX.writeFile(wb, `Notas_3${currentCourse.slice(-1)}_${specialty.name}_TechnicalSkills.xlsx`);
+        });
+
+        // ==================== PDF GENERATION ====================
+        async function generatePDF(studentId) {
+            const courseData = allData[currentCourse];
+            const student = courseData.students.find(s => s.id === studentId);
+            if (!student) return;
+            const specialty = courseSpecialties[currentCourse];
+            const studentCard = document.getElementById(`student-${studentId}`);
+
+            const doc = new jsPDF();
+            const totalScore = Object.values(student.scores).reduce((sum, s) => sum + (s || 0), 0);
+            const grade = calculateGrade(totalScore, MAX_SCORE, 0.60);
+
+            // ---- Page 1: Report ----
+            // Header bar
+            doc.setFillColor(230, 81, 0); // #e65100
+            doc.rect(0, 0, 210, 40, 'F');
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(17);
+            doc.setFont('helvetica', 'bold');
+            doc.text('Video Presentation: My Technical Skills', 105, 14, { align: 'center' });
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'normal');
+            doc.text(`3° Medio ${currentCourse.slice(-1)} — Especialidad: ${specialty.name} (${specialty.english})`, 105, 23, { align: 'center' });
+            doc.text('Unidad 1 — Evaluacion Sumativa — Exigencia 60%', 105, 30, { align: 'center' });
+            doc.text('Fecha: 22-23 Abril 2026 | Rubrica: 6 criterios x 4 pts = 24 pts max', 105, 37, { align: 'center' });
+
+            doc.setTextColor(40, 40, 40);
+            let yPos = 52;
+
+            // Student info
+            doc.setFontSize(12);
+            doc.setFont('helvetica', 'bold');
+            doc.text('Estudiante:', 20, yPos);
+            doc.setFont('helvetica', 'normal');
+            doc.text(student.name, 55, yPos);
+            yPos += 8;
+            doc.setFont('helvetica', 'bold');
+            doc.text('Curso:', 20, yPos);
+            doc.setFont('helvetica', 'normal');
+            doc.text(`3°${currentCourse.slice(-1)} — ${specialty.name}`, 55, yPos);
+            yPos += 12;
+
+            // Results box
+            doc.setFillColor(255, 247, 237);
+            doc.roundedRect(20, yPos, 170, 22, 3, 3, 'F');
+            doc.setDrawColor(251, 146, 60);
+            doc.roundedRect(20, yPos, 170, 22, 3, 3, 'S');
+
+            doc.setFontSize(14);
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(154, 52, 18);
+            doc.text(`Puntaje: ${totalScore} / ${MAX_SCORE}`, 35, yPos + 9);
+
+            const gradeColor = grade >= 4.0 ? [22, 163, 74] : [220, 38, 38];
+            doc.setTextColor(gradeColor[0], gradeColor[1], gradeColor[2]);
+            doc.text(`Nota Final: ${grade.toFixed(1)}`, 130, yPos + 9);
+
+            doc.setTextColor(120, 120, 120);
+            doc.setFontSize(8);
+            doc.setFont('helvetica', 'normal');
+            doc.text(`Puntaje minimo para nota 4.0: ${Math.ceil(MAX_SCORE * 0.60)} pts (60%)`, 35, yPos + 17);
+            yPos += 30;
+
+            // Score breakdown
+            doc.setTextColor(40, 40, 40);
+            doc.setFontSize(12);
+            doc.setFont('helvetica', 'bold');
+            doc.text('Detalle por Criterio:', 20, yPos);
+            yPos += 8;
+
+            rubricStructure.forEach(criterion => {
+                const score = student.scores[criterion.id] || 0;
+                doc.setFontSize(10);
+                doc.setFont('helvetica', 'normal');
+                doc.text(`${criterion.shortName}:`, 25, yPos);
+                doc.setFont('helvetica', 'bold');
+                doc.text(`${score} / 4`, 100, yPos);
+
+                // Score bar
+                doc.setFillColor(255, 237, 213);
+                doc.rect(115, yPos - 3.5, 60, 5, 'F');
+                const barColors = { 0: [200,200,200], 1: [220,38,38], 2: [245,158,11], 3: [37,99,235], 4: [22,163,74] };
+                const c = barColors[score] || [200,200,200];
+                doc.setFillColor(c[0], c[1], c[2]);
+                doc.rect(115, yPos - 3.5, (score / 4) * 60, 5, 'F');
+                yPos += 8;
+            });
+            yPos += 5;
+
+            // Radar chart
+            const chartCanvas = document.createElement('canvas');
+            chartCanvas.width = 400;
+            chartCanvas.height = 400;
+            const labels = rubricStructure.map(c => c.shortName);
+            const dataPoints = rubricStructure.map(c => student.scores[c.id] || 0);
+
+            new Chart(chartCanvas, {
+                type: 'radar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Puntaje',
+                        data: dataPoints,
+                        fill: true,
+                        backgroundColor: 'rgba(230, 81, 0, 0.15)',
+                        borderColor: 'rgb(230, 81, 0)',
+                        pointBackgroundColor: 'rgb(230, 81, 0)',
+                        borderWidth: 2,
+                    }]
+                },
+                options: {
+                    scales: { r: { suggestedMin: 0, suggestedMax: 4, ticks: { stepSize: 1 } } },
+                    plugins: { legend: { display: false } }
+                }
+            });
+            await new Promise(resolve => setTimeout(resolve, 500));
+            const chartImage = chartCanvas.toDataURL('image/png');
+            doc.addImage(chartImage, 'PNG', 30, yPos, 150, 75);
+            yPos += 82;
+
+            // Feedback
+            if (yPos > 240) { doc.addPage(); yPos = 20; }
+            doc.setFontSize(12);
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(40, 40, 40);
+            doc.text('Retroalimentacion:', 20, yPos);
+            yPos += 7;
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(10);
+            const feedbackText = student.feedback || 'No se ha ingresado retroalimentacion.';
+            const splitFeedback = doc.splitTextToSize(feedbackText, 170);
+            doc.text(splitFeedback, 20, yPos);
+
+            // ---- Page 2: Full rubric table ----
+            doc.addPage();
+            doc.setFillColor(230, 81, 0);
+            doc.rect(0, 0, 210, 20, 'F');
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(13);
+            doc.setFont('helvetica', 'bold');
+            doc.text(`Rubrica Detallada — ${student.name}`, 105, 14, { align: 'center' });
+
+            // Ensure card is open for capture
+            const wasOpen = studentCard.classList.contains('is-open');
+            if (!wasOpen) studentCard.classList.add('is-open');
+            await new Promise(resolve => setTimeout(resolve, 400));
+
+            const rubricTable = studentCard.querySelector('.rubric-table');
+            const canvas = await html2canvas(rubricTable, { scale: 2, useCORS: true });
+            const tableImage = canvas.toDataURL('image/png');
+            const imgProps = doc.getImageProperties(tableImage);
+            const pdfWidth = doc.internal.pageSize.getWidth();
+            const imgWidth = pdfWidth - 30;
+            const imgHeight = (imgProps.height * imgWidth) / imgProps.width;
+            doc.addImage(tableImage, 'PNG', 15, 28, imgWidth, Math.min(imgHeight, 245));
+
+            if (!wasOpen) studentCard.classList.remove('is-open');
+
+            doc.save(`TechnicalSkills_3${currentCourse.slice(-1)}_${student.name.replace(/\s+/g, '_').substring(0, 30)}.pdf`);
+        }
+
+        // ==================== INIT ====================
+        document.addEventListener('DOMContentLoaded', () => {
+            loadData();
+        });
+    </script>
+</body>
+</html>
