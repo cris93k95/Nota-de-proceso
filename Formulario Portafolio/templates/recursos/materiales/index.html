@@ -1,0 +1,745 @@
+﻿<!DOCTYPE html>
+
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>📚 Materiales de Clases — Inglés 2026</title>
+<style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #0f172a; color: #e2e8f0; min-height: 100vh; }
+
+        /* HEADER */
+        .hero {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 50%, #1e1b4b 100%);
+            padding: 50px 20px 40px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            position: relative;
+            overflow: hidden;
+        }
+        .hero::before {
+            content: '';
+            position: absolute; inset: 0;
+            background: radial-gradient(ellipse at 50% 0%, rgba(99,102,241,0.15) 0%, transparent 70%);
+        }
+        .hero h1 {
+            font-size: 2.2em; font-weight: 800;
+            background: linear-gradient(135deg, #a5b4fc, #818cf8, #c4b5fd);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text;
+            position: relative;
+        }
+        .hero p { color: #94a3b8; font-size: 1.05em; margin-top: 8px; position: relative; }
+        .hero .badge-row { display: flex; justify-content: center; gap: 10px; margin-top: 15px; flex-wrap: wrap; position: relative; }
+        .hero .badge {
+            background: rgba(99,102,241,0.15); border: 1px solid rgba(99,102,241,0.3);
+            padding: 5px 14px; border-radius: 20px; font-size: 0.8em; color: #a5b4fc;
+        }
+
+        .container { max-width: 1100px; margin: 0 auto; padding: 30px 20px; }
+
+        /* LEVEL TABS */
+        .level-tabs {
+            display: flex; gap: 8px; margin-bottom: 25px; flex-wrap: wrap;
+            background: #1e293b; padding: 6px; border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+        .level-tab {
+            flex: 1; min-width: 120px; padding: 12px 20px; border-radius: 8px;
+            text-align: center; cursor: pointer; font-weight: 600; font-size: 0.95em;
+            transition: all 0.2s; color: #64748b; background: transparent;
+            border: none; font-family: inherit;
+        }
+        .level-tab:hover { color: #cbd5e1; background: rgba(255,255,255,0.04); }
+        .level-tab.active { background: #6366f1; color: white; box-shadow: 0 4px 15px rgba(99,102,241,0.3); }
+
+        /* LEVEL CONTENT */
+        .level-content { display: none; }
+        .level-content.active { display: block; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* COURSE CARDS */
+        .course-section { margin-bottom: 30px; }
+        .course-header {
+            display: flex; align-items: center; gap: 12px;
+            margin-bottom: 15px; padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+        .course-icon {
+            width: 42px; height: 42px; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.3em; flex-shrink: 0;
+        }
+        .course-header h3 { font-size: 1.15em; font-weight: 700; color: #f1f5f9; }
+        .course-header span { font-size: 0.85em; color: #64748b; }
+
+        /* UNIT ACCORDION */
+        .unit-group { margin-bottom: 10px; }
+        .unit-title {
+            background: #1e293b; border: 1px solid rgba(255,255,255,0.06);
+            padding: 12px 18px; border-radius: 10px; cursor: pointer;
+            display: flex; justify-content: space-between; align-items: center;
+            font-weight: 600; font-size: 0.92em; color: #cbd5e1;
+            transition: all 0.2s;
+        }
+        .unit-title:hover { background: #253348; border-color: rgba(99,102,241,0.3); }
+        .unit-title.open { border-radius: 10px 10px 0 0; background: #253348; border-color: rgba(99,102,241,0.3); }
+        .unit-title .arrow { transition: transform 0.2s; font-size: 0.8em; color: #64748b; }
+        .unit-title.open .arrow { transform: rotate(90deg); color: #818cf8; }
+        .unit-classes {
+            display: none; background: #1a2537;
+            border: 1px solid rgba(99,102,241,0.2); border-top: none;
+            border-radius: 0 0 10px 10px; padding: 8px;
+        }
+        .unit-classes.open { display: block; animation: fadeIn 0.2s ease; }
+
+        /* CLASS LINKS */
+        .class-link {
+            display: flex; align-items: center; gap: 12px;
+            padding: 12px 16px; border-radius: 8px;
+            text-decoration: none; color: #cbd5e1;
+            transition: all 0.15s; font-size: 0.9em;
+        }
+        .class-link:hover { background: rgba(99,102,241,0.1); color: #a5b4fc; }
+        .class-link .num {
+            width: 30px; height: 30px; border-radius: 7px;
+            background: rgba(99,102,241,0.15); color: #818cf8;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: 0.85em; flex-shrink: 0;
+        }
+        .class-link .title { flex: 1; }
+        .class-link .tag {
+            font-size: 0.72em; padding: 3px 8px; border-radius: 5px;
+            font-weight: 500;
+        }
+        .tag-clase { background: rgba(34,197,94,0.15); color: #4ade80; }
+        .tag-guia { background: rgba(234,179,8,0.15); color: #facc15; }
+        .tag-eval { background: rgba(239,68,68,0.15); color: #f87171; }
+
+        .class-link.done { opacity: 0.65; }
+        .class-link.done .title { text-decoration: line-through; text-decoration-color: #4ade8066; }
+        .class-link.next { background: rgba(99,102,241,0.08); border: 1px solid rgba(99,102,241,0.2); }
+
+        /* TOGGLE BUTTON */
+        .toggle-status {
+            padding: 4px 12px; border-radius: 6px; font-size: 0.72em; font-weight: 700;
+            border: none; cursor: pointer; font-family: inherit; white-space: nowrap;
+            transition: all 0.2s; flex-shrink: 0; margin-left: auto;
+        }
+        .toggle-status.no-realizada {
+            background: rgba(239,68,68,0.2); color: #f87171; border: 1px solid rgba(239,68,68,0.3);
+        }
+        .toggle-status.no-realizada:hover { background: rgba(239,68,68,0.35); }
+        .toggle-status.realizada {
+            background: rgba(34,197,94,0.25); color: #4ade80; border: 1px solid rgba(34,197,94,0.4);
+        }
+        .toggle-status.realizada:hover { background: rgba(34,197,94,0.4); }
+
+        /* RESET BUTTON */
+        .reset-btn {
+            background: rgba(239,68,68,0.15); color: #f87171; border: 1px solid rgba(239,68,68,0.3);
+            padding: 8px 16px; border-radius: 8px; font-size: 0.82em; font-weight: 600;
+            cursor: pointer; font-family: inherit; transition: all 0.2s; margin-top: 12px;
+        }
+        .reset-btn:hover { background: rgba(239,68,68,0.3); }
+
+        /* PROGRESS DASHBOARD */
+        .progress-dashboard {
+            background: #1e293b; border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 12px; padding: 20px; margin-bottom: 25px;
+        }
+        .progress-dashboard h3 { color: #f1f5f9; font-size: 1em; margin-bottom: 15px; }
+        .progress-stats { display: flex; gap: 15px; flex-wrap: wrap; }
+        .stat-card {
+            flex: 1; min-width: 100px; background: #0f172a;
+            border-radius: 10px; padding: 15px; text-align: center;
+            border: 1px solid rgba(255,255,255,0.04);
+        }
+        .stat-card .number { font-size: 1.8em; font-weight: 800; }
+        .stat-card .label { font-size: 0.75em; color: #64748b; margin-top: 4px; }
+        .stat-done .number { color: #4ade80; }
+        .stat-pending .number { color: #facc15; }
+        .stat-total .number { color: #818cf8; }
+
+        /* SEARCH */
+        .search-bar {
+            background: #1e293b; border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 10px; padding: 12px 18px; margin-bottom: 20px;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .search-bar input {
+            background: none; border: none; outline: none;
+            color: #e2e8f0; font-size: 0.95em; width: 100%;
+            font-family: inherit;
+        }
+        .search-bar input::placeholder { color: #475569; }
+        .search-bar .icon { color: #475569; font-size: 1.1em; }
+
+        /* FOOTER */
+        .footer {
+            text-align: center; padding: 30px 20px; margin-top: 40px;
+            border-top: 1px solid rgba(255,255,255,0.06);
+            color: #475569; font-size: 0.8em;
+        }
+
+        /* COLOR THEMES PER SPECIALTY */
+        .color-mec-ind { background: #1565c0; }
+        .color-mec-auto { background: #c62828; }
+        .color-elec { background: #e65100; }
+        .color-graf { background: #4a148c; }
+        .color-electron { background: #00695c; }
+        .color-general { background: #6366f1; }
+
+        /* RESPONSIVE */
+        @media (max-width: 600px) {
+            .hero h1 { font-size: 1.5em; }
+            .level-tab { min-width: 80px; padding: 10px 12px; font-size: 0.85em; }
+        }
+    </style>
+</head>
+<body>
+<div class="hero">
+<div style="position:absolute;top:15px;left:20px;z-index:10"><a href="/panel" style="color:#94a3b8;text-decoration:none;font-size:0.85em;">← Panel Admin</a></div>
+<h1>📚 Materiales de Clases</h1>
+<p>Inglés — Liceo Técnico Profesional — 2026</p>
+<div class="badge-row">
+<span class="badge">📱 Acceso desde cualquier dispositivo</span>
+<span class="badge">🔄 Actualización automática</span>
+<span class="badge">📂 Organizado por curso</span>
+</div>
+</div>
+<div class="container">
+<!-- PROGRESS DASHBOARD -->
+<div class="progress-dashboard" id="progressDashboard">
+<h3>📊 Progreso General</h3>
+<div class="progress-stats">
+<div class="stat-card stat-done">
+<div class="number" id="statDone">0</div>
+<div class="label">Realizadas</div>
+</div>
+<div class="stat-card stat-pending">
+<div class="number" id="statPending">0</div>
+<div class="label">Pendientes</div>
+</div>
+<div class="stat-card stat-total">
+<div class="number" id="statTotal">0</div>
+<div class="label">Total</div>
+</div>
+</div>
+<button class="reset-btn" onclick="resetProgress()">🔄 Resetear todo el marcaje</button>
+</div>
+<div class="search-bar">
+<span class="icon">🔍</span>
+<input id="searchInput" oninput="filterMaterials()" placeholder="Buscar material por nombre, unidad o especialidad..." type="text"/>
+</div>
+<div class="level-tabs">
+<button class="level-tab active" onclick="switchLevel('1ro')">1° Medio</button>
+<button class="level-tab" onclick="switchLevel('3ro')">3° Medio</button>
+<button class="level-tab" onclick="switchLevel('4to')">4° Medio</button>
+</div>
+<!-- ======================== 1° MEDIO ======================== -->
+<div class="level-content active" id="level-1ro">
+<div class="course-section">
+<div class="course-header">
+<div class="course-icon color-general">📘</div>
+<div>
+<h3>1° Medio — Inglés General</h3>
+<span>Plan común — Todos los cursos</span>
+</div>
+</div>
+<div class="unit-group">
+<div class="unit-title" onclick="toggleUnit(this)"><span>📁 Unidad 1 — The World of Technical Work</span><span class="arrow">▶</span></div>
+<div class="unit-classes">
+<a class="class-link" data-progress-id="1ro-lu-ju/u1/Clase_1" href="archivo/1ro-medio/lu-ju/u1/Clase_1_U1_1ro_LuJu.html"><span class="num">1</span><span class="title">Clase 1 — 1° Medio — Inglés General (Lu+Ju)</span><span class="tag tag-clase">Clase</span><span class="status-badge status-pending" data-status-badge="">⏳ Pendiente</span></a>
+<a class="class-link" data-progress-id="1ro-lu-ju/u1/Clase_2" href="archivo/1ro-medio/lu-ju/u1/Clase_2_U1_1ro_LuJu.html"><span class="num">2</span><span class="title">Clase 2 — 1° Medio — Inglés General (Lu+Ju)</span><span class="tag tag-clase">Clase</span><span class="status-badge status-pending" data-status-badge="">⏳ Pendiente</span></a>
+<a class="class-link" data-progress-id="1ro-lu-ju/u1/Clase_3" href="archivo/1ro-medio/lu-ju/u1/Clase_3_U1_1ro_LuJu.html"><span class="num">3</span><span class="title">Clase 3 — 1° Medio — Inglés General (Lu+Ju)</span><span class="tag tag-clase">Clase</span><span class="status-badge status-pending" data-status-badge="">⏳ Pendiente</span></a>
+<a class="class-link" data-progress-id="1ro-lu-ju/u1/Clase_4" href="archivo/1ro-medio/lu-ju/u1/Clase_4_U1_1ro_LuJu.html"><span class="num">4</span><span class="title">Clase 4 — 1° Medio — Inglés General (Lu+Ju)</span><span class="tag tag-clase">Clase</span><span class="status-badge status-pending" data-status-badge="">⏳ Pendiente</span></a>
+<a class="class-link" data-progress-id="1ro-lu-ju/u1/Clase_5" href="archivo/1ro-medio/lu-ju/u1/Clase_5_U1_1ro_LuJu.html"><span class="num">5</span><span class="title">Clase 5 — 1° Medio — Inglés General (Lu+Ju)</span><span class="tag tag-clase">Clase</span><span class="status-badge status-pending" data-status-badge="">⏳ Pendiente</span></a>
+<a class="class-link" data-progress-id="1ro-lu-ju/u1/Clase_6" href="archivo/1ro-medio/lu-ju/u1/Clase_6_U1_1ro_LuJu.html"><span class="num">6</span><span class="title">Clase 6 — 1° Medio — Inglés General (Lu+Ju)</span><span class="tag tag-clase">Clase</span><span class="status-badge status-pending" data-status-badge="">⏳ Pendiente</span></a>
+<a class="class-link" data-progress-id="1ro-lu-ju/u1/Clase_7" href="archivo/1ro-medio/lu-ju/u1/Clase_7_U1_1ro_LuJu.html"><span class="num">7</span><span class="title">Clase 7 — 1° Medio — Inglés General (Lu+Ju)</span><span class="tag tag-clase">Clase</span><span class="status-badge status-pending" data-status-badge="">⏳ Pendiente</span></a>
+<a class="class-link" data-progress-id="1ro-lu-ju/u1/Clase_8" href="archivo/1ro-medio/lu-ju/u1/Clase_8_U1_1ro_LuJu.html"><span class="num">8</span><span class="title">Clase 8 — 1° Medio — Inglés General (Lu+Ju)</span><span class="tag tag-clase">Clase</span><span class="status-badge status-pending" data-status-badge="">⏳ Pendiente</span></a>
+<a class="class-link" data-progress-id="1ro-lu-ju/u1/Clase_9" href="archivo/1ro-medio/lu-ju/u1/Clase_9_U1_1ro_LuJu.html"><span class="num">9</span><span class="title">Clase 9 — 1° Medio — Inglés General (Lu+Ju)</span><span class="tag tag-clase">Clase</span><span class="status-badge status-pending" data-status-badge="">⏳ Pendiente</span></a>
+<a class="class-link" data-progress-id="1ro-lu-ju/u1/Clase_10" href="archivo/1ro-medio/lu-ju/u1/Clase_10_U1_1ro_LuJu.html"><span class="num">10</span><span class="title">Clase 10 — 1° Medio — Inglés General (Lu+Ju)</span><span class="tag tag-clase">Clase</span><span class="status-badge status-pending" data-status-badge="">⏳ Pendiente</span></a>
+<a class="class-link" data-progress-id="1ro-lu-ju/u1/Clase_11" href="archivo/1ro-medio/lu-ju/u1/Clase_11_U1_1ro_LuJu.html"><span class="num">11</span><span class="title">Clase 11 — 1° Medio — Inglés General (Lu+Ju)</span><span class="tag tag-clase">Clase</span><span class="status-badge status-pending" data-status-badge="">⏳ Pendiente</span></a>
+<a class="class-link" data-progress-id="1ro-lu-ju/u1/Clase_12" href="archivo/1ro-medio/lu-ju/u1/Clase_12_U1_1ro_LuJu.html"><span class="num">12</span><span class="title">Clase 12 — 1° Medio — Inglés General (Lu+Ju)</span><span class="tag tag-clase">Clase</span><span class="status-badge status-pending" data-status-badge="">⏳ Pendiente</span></a>
+<a class="class-link" data-progress-id="1ro-lu-ju/u1/Clase_13" href="archivo/1ro-medio/lu-ju/u1/Clase_13_U1_1ro_LuJu.html"><span class="num">13</span><span class="title">Clase 13 — 1° Medio — Inglés General (Lu+Ju)</span><span class="tag tag-clase">Clase</span><span class="status-badge status-pending" data-status-badge="">⏳ Pendiente</span></a>
+<a class="class-link" data-progress-id="1ro-lu-ju/u1/Clase_14" href="archivo/1ro-medio/lu-ju/u1/Clase_14_U1_1ro_LuJu.html"><span class="num">14</span><span class="title">Clase 14 — 1° Medio — Inglés General (Lu+Ju)</span><span class="tag tag-clase">Clase</span><span class="status-badge status-pending" data-status-badge="">⏳ Pendiente</span></a>
+<a class="class-link" data-progress-id="1ro-lu-ju/u1/Clase_15" href="archivo/1ro-medio/lu-ju/u1/Clase_15_U1_1ro_LuJu.html"><span class="num">15</span><span class="title">Clase 15 — 1° Medio — Inglés General (Lu+Ju)</span><span class="tag tag-clase">Clase</span><span class="status-badge status-pending" data-status-badge="">⏳ Pendiente</span></a>
+<a class="class-link" data-progress-id="1ro-lu-ju/u1/Clase_16" href="archivo/1ro-medio/lu-ju/u1/Clase_16_U1_1ro_LuJu.html"><span class="num">16</span><span class="title">Clase 16 — 1° Medio — Inglés General (Lu+Ju)</span><span class="tag tag-clase">Clase</span><span class="status-badge status-pending" data-status-badge="">⏳ Pendiente</span></a>
+<a class="class-link" data-progress-id="1ro-lu-ju/u1/Clase_17" href="archivo/1ro-medio/lu-ju/u1/Clase_17_U1_1ro_LuJu.html"><span class="num">17</span><span class="title">Clase 17 — 1° Medio — Inglés General (Lu+Ju)</span><span class="tag tag-clase">Clase</span><span class="status-badge status-pending" data-status-badge="">⏳ Pendiente</span></a>
+</div>
+</div>
+</div>
+<div class="unit-group">
+<div class="unit-title" onclick="toggleUnit(this)">
+<span>📁 Unidad 2</span>
+<span class="arrow">▶</span>
+</div>
+<div class="unit-classes">
+<div class="empty-state">
+<div class="icon">🚧</div>
+<p>Materiales en preparación</p>
+</div>
+</div>
+</div>
+<div class="unit-group">
+<div class="unit-title" onclick="toggleUnit(this)">
+<span>📁 Unidad 3</span>
+<span class="arrow">▶</span>
+</div>
+<div class="unit-classes">
+<div class="empty-state">
+<div class="icon">🚧</div>
+<p>Materiales en preparación</p>
+</div>
+</div>
+</div>
+<div class="unit-group">
+<div class="unit-title" onclick="toggleUnit(this)">
+<span>📁 Unidad 4</span>
+<span class="arrow">▶</span>
+</div>
+<div class="unit-classes">
+<div class="empty-state">
+<div class="icon">🚧</div>
+<p>Materiales en preparación</p>
+</div>
+</div>
+</div>
+<div class="unit-group">
+<div class="unit-title" onclick="toggleUnit(this)"><span>📋 Instrumentos de Evaluación</span><span class="arrow">▶</span></div>
+<div class="unit-classes">
+<a class="class-link" href="archivo/1ro-medio/instrumentos/diagnostico_1ro_medio.html"><span class="num">📝</span><span class="title">Evaluación Diagnóstica — 1° Medio</span><span class="tag tag-eval">Diagnóstico</span></a>
+<a class="class-link" href="archivo/1ro-medio/instrumentos/rubrica_presentacion_oral.html"><span class="num">📋</span><span class="title">Rúbrica — Video: My Future Career</span><span class="tag tag-eval">Rúbrica</span></a>
+<a class="class-link" href="archivo/1ro-medio/instrumentos/PRUEBA_COMPRENSION_LECTORA_U1_1RO_MEDIO.docx"><span class="num">📝</span><span class="title">Prueba — Comprensión Lectora U1 — 1° Medio</span><span class="tag tag-eval">Prueba</span></a>
+</div>
+</div>
+</div>
+<!-- ======================== 3° MEDIO ======================== -->
+<div class="level-content" id="level-3ro">
+<div class="course-section" data-search="3ro a mecanica industrial">
+<div class="course-header">
+<div class="course-icon color-mec-ind">⚙️</div>
+<div>
+<h3>3°A — Mecánica Industrial</h3>
+<span>Especialidad técnica</span>
+</div>
+</div>
+<div class="unit-group">
+<div class="unit-title" onclick="toggleUnit(this)"><span>📁 Unidad 1 — Technical Skills &amp; Career Paths</span><span class="arrow">▶</span></div>
+<div class="unit-classes">
+<a class="class-link" data-progress-id="3A-industrial/u1/Clase_1" href="archivo/3ro-medio/3A-industrial/u1/Clase_1_U1_3roA_Industrial.html"><span class="num">1</span><span class="title">Clase 1 — 3°A — Mecánica Industrial</span><span class="tag tag-clase">Clase</span><span class="status-badge status-pending" data-status-badge="">⏳ Pendiente</span></a>
+<a class="class-link" data-progress-id="3A-industrial/u1/Clase_2" href="archivo/3ro-medio/3A-industrial/u1/Clase_2_U1_3roA_Industrial.html"><span class="num">2</span><span class="title">Clase 2 — 3°A — Mecánica Industrial</span><span class="tag tag-clase">Clase</span><span class="status-badge status-pending" data-status-badge="">⏳ Pendiente</span></a>
+<a class="class-link" data-progress-id="3A-industrial/u1/Clase_3" href="archivo/3ro-medio/3A-industrial/u1/Clase_3_U1_3ro_Industrial.html"><span class="num">3</span><span class="title">Clase 3 — 3° Medio — Mecánica Industrial</span><span class="tag tag-clase">Clase</span><span class="status-badge status-pending" data-status-badge="">⏳ Pendiente</span></a>
+<a class="class-link" data-progress-id="3A-industrial/u1/Clase_4" href="archivo/3ro-medio/3A-industrial/u1/Clase_4_U1_3ro_Industrial.html"><span class="num">4</span><span class="title">Clase 4 — 3° Medio — Mecánica Industrial</span><span class="tag tag-clase">Clase</span><span class="status-badge status-pending" data-status-badge="">⏳ Pendiente</span></a>
+<a class="class-link" data-progress-id="3A-industrial/u1/Clase_5" href="archivo/3ro-medio/3A-industrial/u1/Clase_5_U1_3ro_Industrial.html"><span class="num">5</span><span class="title">Clase 5 — 3° Medio — Mecánica Industrial</span><span class="tag tag-clase">Clase</span><span class="status-badge status-pending" data-status-badge="">⏳ Pendiente</span></a>
+<a class="class-link" data-progress-id="3A-industrial/u1/Clase_6" href="archivo/3ro-medio/3A-industrial/u1/Clase_6_U1_3ro_Industrial.html"><span class="num">6</span><span class="title">Clase 6 — 3° Medio — Mecánica Industrial</span><span class="tag tag-clase">Clase</span><span class="status-badge status-pending" data-status-badge="">⏳ Pendiente</span></a>
+<a class="class-link" data-progress-id="3A-industrial/u1/Clase_7" href="archivo/3ro-medio/3A-industrial/u1/Clase_7_U1_3ro_Industrial.html"><span class="num">7</span><span class="title">Clase 7 — 3° Medio — Mecánica Industrial</span><span class="tag tag-clase">Clase</span><span class="status-badge status-pending" data-status-badge="">⏳ Pendiente</span></a>
+<a class="class-link" data-progress-id="3A-industrial/u1/Clase_8" href="archivo/3ro-medio/3A-industrial/u1/Clase_8_U1_3ro_Industrial.html"><span class="num">8</span><span class="title">Clase 8 — 3° Medio — Mecánica Industrial</span><span class="tag tag-clase">Clase</span><span class="status-badge status-pending" data-status-badge="">⏳ Pendiente</span></a>
+<a class="class-link" data-progress-id="3A-industrial/u1/Clase_9" href="archivo/3ro-medio/3A-industrial/u1/Clase_9_U1_3ro_Industrial.html"><span class="num">9</span><span class="title">Clase 9 — 3° Medio — Mecánica Industrial</span><span class="tag tag-clase">Clase</span><span class="status-badge status-pending" data-status-badge="">⏳ Pendiente</span></a>
+</div>
+</div>
+<div class="unit-group">
+<div class="unit-title" onclick="toggleUnit(this)"><span>📋 Instrumentos de Evaluación</span><span class="arrow">▶</span></div>
+<div class="unit-classes">
+<a class="class-link" href="archivo/3ro-medio/instrumentos/diagnostico_3ro_industrial.html"><span class="num">📝</span><span class="title">Evaluación Diagnóstica — 3°A Mecánica Industrial</span><span class="tag tag-eval">Diagnóstico</span></a>
+<a class="class-link" href="archivo/3ro-medio/instrumentos/rubrica_presentacion_oral.html"><span class="num">📋</span><span class="title">Rúbrica — My Technical Skills</span><span class="tag tag-eval">Rúbrica</span></a>
+</div>
+</div>
+</div>
+<div class="course-section" data-search="3ro b mecanica automotriz">
+<div class="course-header">
+<div class="course-icon color-mec-auto">🚗</div>
+<div>
+<h3>3°B — Mecánica Automotriz</h3>
+<span>Especialidad técnica</span>
+</div>
+</div>
+<div class="unit-group">
+<div class="unit-title" onclick="toggleUnit(this)"><span>📁 Unidad 1 — Technical Skills &amp; Career Paths</span><span class="arrow">▶</span></div>
+<div class="unit-classes">
+<a class="class-link" data-progress-id="3B-automotriz/u1/Clase_1" href="archivo/3ro-medio/3B-automotriz/u1/Clase_1_U1_3roB_Automotriz.html"><span class="num">1</span><span class="title">Clase 1 — 3°B — Mecánica Automotriz</span><span class="tag tag-clase">Clase</span><span class="status-badge status-pending" data-status-badge="">⏳ Pendiente</span></a>
+<a class="class-link" data-progress-id="3B-automotriz/u1/Clase_2" href="archivo/3ro-medio/3B-automotriz/u1/Clase_2_U1_3roB_Automotriz.html"><span class="num">2</span><span class="title">Clase 2 — 3°B — Mecánica Automotriz</span><span class="tag tag-clase">Clase</span><span class="status-badge status-pending" data-status-badge="">⏳ Pendiente</span></a>
+<a class="class-link" data-progress-id="3B-automotriz/u1/Clase_3" href="archivo/3ro-medio/3B-automotriz/u1/Clase_3_U1_3ro_Automotriz.html"><span class="num">3</span><span class="title">Clase 3 — 3° Medio — Mecánica Automotriz</span><span class="tag tag-clase">Clase</span><span class="status-badge status-pending" data-status-badge="">⏳ Pendiente</span></a>
+<a class="class-link" data-progress-id="3B-automotriz/u1/Clase_4" href="archivo/3ro-medio/3B-automotriz/u1/Clase_4_U1_3ro_Automotriz.html"><span class="num">4</span><span class="title">Clase 4 — 3° Medio — Mecánica Automotriz</span><span class="tag tag-clase">Clase</span><span class="status-badge status-pending" data-status-badge="">⏳ Pendiente</span></a>
+<a class="class-link" data-progress-id="3B-automotriz/u1/Clase_5" href="archivo/3ro-medio/3B-automotriz/u1/Clase_5_U1_3ro_Automotriz.html"><span class="num">5</span><span class="title">Clase 5 — 3° Medio — Mecánica Automotriz</span><span class="tag tag-clase">Clase</span><span class="status-badge status-pending" data-status-badge="">⏳ Pendiente</span></a>
+<a class="class-link" data-progress-id="3B-automotriz/u1/Clase_6" href="archivo/3ro-medio/3B-automotriz/u1/Clase_6_U1_3ro_Automotriz.html"><span class="num">6</span><span class="title">Clase 6 — 3° Medio — Mecánica Automotriz</span><span class="tag tag-clase">Clase</span><span class="status-badge status-pending" data-status-badge="">⏳ Pendiente</span></a>
+<a class="class-link" data-progress-id="3B-automotriz/u1/Clase_7" href="archivo/3ro-medio/3B-automotriz/u1/Clase_7_U1_3ro_Automotriz.html"><span class="num">7</span><span class="title">Clase 7 — 3° Medio — Mecánica Automotriz</span><span class="tag tag-clase">Clase</span><span class="status-badge status-pending" data-status-badge="">⏳ Pendiente</span></a>
+<a class="class-link" data-progress-id="3B-automotriz/u1/Clase_8" href="archivo/3ro-medio/3B-automotriz/u1/Clase_8_U1_3ro_Automotriz.html"><span class="num">8</span><span class="title">Clase 8 — 3° Medio — Mecánica Automotriz</span><span class="tag tag-clase">Clase</span><span class="status-badge status-pending" data-status-badge="">⏳ Pendiente</span></a>
+<a class="class-link" data-progress-id="3B-automotriz/u1/Clase_9" href="archivo/3ro-medio/3B-automotriz/u1/Clase_9_U1_3ro_Automotriz.html"><span class="num">9</span><span class="title">Clase 9 — 3° Medio — Mecánica Automotriz</span><span class="tag tag-clase">Clase</span><span class="status-badge status-pending" data-status-badge="">⏳ Pendiente</span></a>
+</div>
+</div>
+<div class="unit-group">
+<div class="unit-title" onclick="toggleUnit(this)"><span>📋 Instrumentos de Evaluación</span><span class="arrow">▶</span></div>
+<div class="unit-classes">
+<a class="class-link" href="archivo/3ro-medio/instrumentos/diagnostico_3ro_automotriz.html"><span class="num">📝</span><span class="title">Evaluación Diagnóstica — 3°B Mecánica Automotriz</span><span class="tag tag-eval">Diagnóstico</span></a>
+<a class="class-link" href="archivo/3ro-medio/instrumentos/rubrica_presentacion_oral.html"><span class="num">📋</span><span class="title">Rúbrica — My Technical Skills</span><span class="tag tag-eval">Rúbrica</span></a>
+</div>
+</div>
+</div>
+<div class="course-section" data-search="3ro c electricidad">
+<div class="course-header">
+<div class="course-icon color-elec">⚡</div>
+<div>
+<h3>3°C — Electricidad</h3>
+<span>Especialidad técnica</span>
+</div>
+</div>
+<div class="unit-group">
+<div class="unit-title" onclick="toggleUnit(this)"><span>📁 Unidad 1 — Technical Skills &amp; Career Paths</span><span class="arrow">▶</span></div>
+<div class="unit-classes">
+<a class="class-link" data-progress-id="3C-electricidad/u1/Clase_1" href="archivo/3ro-medio/3C-electricidad/u1/Clase_1_U1_3roC_Electricidad.html"><span class="num">1</span><span class="title">Clase 1 — 3°C — Electricidad</span><span class="tag tag-clase">Clase</span><span class="status-badge status-pending" data-status-badge="">⏳ Pendiente</span></a>
+<a class="class-link" data-progress-id="3C-electricidad/u1/Clase_2" href="archivo/3ro-medio/3C-electricidad/u1/Clase_2_U1_3roC_Electricidad.html"><span class="num">2</span><span class="title">Clase 2 — 3°C — Electricidad</span><span class="tag tag-clase">Clase</span><span class="status-badge status-pending" data-status-badge="">⏳ Pendiente</span></a>
+<a class="class-link" data-progress-id="3C-electricidad/u1/Clase_3" href="archivo/3ro-medio/3C-electricidad/u1/Clase_3_U1_3ro_Electricidad.html"><span class="num">3</span><span class="title">Clase 3 — 3° Medio — Electricidad</span><span class="tag tag-clase">Clase</span><span class="status-badge status-pending" data-status-badge="">⏳ Pendiente</span></a>
+<a class="class-link" data-progress-id="3C-electricidad/u1/Clase_4" href="archivo/3ro-medio/3C-electricidad/u1/Clase_4_U1_3ro_Electricidad.html"><span class="num">4</span><span class="title">Clase 4 — 3° Medio — Electricidad</span><span class="tag tag-clase">Clase</span><span class="status-badge status-pending" data-status-badge="">⏳ Pendiente</span></a>
+<a class="class-link" data-progress-id="3C-electricidad/u1/Clase_5" href="archivo/3ro-medio/3C-electricidad/u1/Clase_5_U1_3ro_Electricidad.html"><span class="num">5</span><span class="title">Clase 5 — 3° Medio — Electricidad</span><span class="tag tag-clase">Clase</span><span class="status-badge status-pending" data-status-badge="">⏳ Pendiente</span></a>
+<a class="class-link" data-progress-id="3C-electricidad/u1/Clase_6" href="archivo/3ro-medio/3C-electricidad/u1/Clase_6_U1_3ro_Electricidad.html"><span class="num">6</span><span class="title">Clase 6 — 3° Medio — Electricidad</span><span class="tag tag-clase">Clase</span><span class="status-badge status-pending" data-status-badge="">⏳ Pendiente</span></a>
+<a class="class-link" data-progress-id="3C-electricidad/u1/Clase_7" href="archivo/3ro-medio/3C-electricidad/u1/Clase_7_U1_3ro_Electricidad.html"><span class="num">7</span><span class="title">Clase 7 — 3° Medio — Electricidad</span><span class="tag tag-clase">Clase</span><span class="status-badge status-pending" data-status-badge="">⏳ Pendiente</span></a>
+<a class="class-link" data-progress-id="3C-electricidad/u1/Clase_8" href="archivo/3ro-medio/3C-electricidad/u1/Clase_8_U1_3ro_Electricidad.html"><span class="num">8</span><span class="title">Clase 8 — 3° Medio — Electricidad</span><span class="tag tag-clase">Clase</span><span class="status-badge status-pending" data-status-badge="">⏳ Pendiente</span></a>
+<a class="class-link" data-progress-id="3C-electricidad/u1/Clase_9" href="archivo/3ro-medio/3C-electricidad/u1/Clase_9_U1_3ro_Electricidad.html"><span class="num">9</span><span class="title">Clase 9 — 3° Medio — Electricidad</span><span class="tag tag-clase">Clase</span><span class="status-badge status-pending" data-status-badge="">⏳ Pendiente</span></a>
+</div>
+</div>
+<div class="unit-group">
+<div class="unit-title" onclick="toggleUnit(this)"><span>📋 Instrumentos de Evaluación</span><span class="arrow">▶</span></div>
+<div class="unit-classes">
+<a class="class-link" href="archivo/3ro-medio/instrumentos/diagnostico_3ro_electricidad.html"><span class="num">📝</span><span class="title">Evaluación Diagnóstica — 3°C Electricidad</span><span class="tag tag-eval">Diagnóstico</span></a>
+<a class="class-link" href="archivo/3ro-medio/instrumentos/rubrica_presentacion_oral.html"><span class="num">📋</span><span class="title">Rúbrica — My Technical Skills</span><span class="tag tag-eval">Rúbrica</span></a>
+</div>
+</div>
+</div>
+<div class="course-section" data-search="3ro d grafica">
+<div class="course-header">
+<div class="course-icon color-graf">🎨</div>
+<div>
+<h3>3°D — Gráfica</h3>
+<span>Especialidad técnica</span>
+</div>
+</div>
+<div class="unit-group">
+<div class="unit-title" onclick="toggleUnit(this)"><span>📁 Unidad 1 — Technical Skills &amp; Career Paths</span><span class="arrow">▶</span></div>
+<div class="unit-classes">
+<a class="class-link" data-progress-id="3D-grafica/u1/Clase_1" href="archivo/3ro-medio/3D-grafica/u1/Clase_1_U1_3roD_Grafica.html"><span class="num">1</span><span class="title">Clase 1 — 3°D — Gráfica</span><span class="tag tag-clase">Clase</span><span class="status-badge status-pending" data-status-badge="">⏳ Pendiente</span></a>
+<a class="class-link" data-progress-id="3D-grafica/u1/Clase_2" href="archivo/3ro-medio/3D-grafica/u1/Clase_2_U1_3roD_Grafica.html"><span class="num">2</span><span class="title">Clase 2 — 3°D — Gráfica</span><span class="tag tag-clase">Clase</span><span class="status-badge status-pending" data-status-badge="">⏳ Pendiente</span></a>
+<a class="class-link" data-progress-id="3D-grafica/u1/Clase_3" href="archivo/3ro-medio/3D-grafica/u1/Clase_3_U1_3ro_Grafica.html"><span class="num">3</span><span class="title">Clase 3 — 3° Medio — Gráfica</span><span class="tag tag-clase">Clase</span><span class="status-badge status-pending" data-status-badge="">⏳ Pendiente</span></a>
+<a class="class-link" data-progress-id="3D-grafica/u1/Clase_4" href="archivo/3ro-medio/3D-grafica/u1/Clase_4_U1_3ro_Grafica.html"><span class="num">4</span><span class="title">Clase 4 — 3° Medio — Gráfica</span><span class="tag tag-clase">Clase</span><span class="status-badge status-pending" data-status-badge="">⏳ Pendiente</span></a>
+<a class="class-link" data-progress-id="3D-grafica/u1/Clase_5" href="archivo/3ro-medio/3D-grafica/u1/Clase_5_U1_3ro_Grafica.html"><span class="num">5</span><span class="title">Clase 5 — 3° Medio — Gráfica</span><span class="tag tag-clase">Clase</span><span class="status-badge status-pending" data-status-badge="">⏳ Pendiente</span></a>
+<a class="class-link" data-progress-id="3D-grafica/u1/Clase_6" href="archivo/3ro-medio/3D-grafica/u1/Clase_6_U1_3ro_Grafica.html"><span class="num">6</span><span class="title">Clase 6 — 3° Medio — Gráfica</span><span class="tag tag-clase">Clase</span><span class="status-badge status-pending" data-status-badge="">⏳ Pendiente</span></a>
+<a class="class-link" data-progress-id="3D-grafica/u1/Clase_7" href="archivo/3ro-medio/3D-grafica/u1/Clase_7_U1_3ro_Grafica.html"><span class="num">7</span><span class="title">Clase 7 — 3° Medio — Gráfica</span><span class="tag tag-clase">Clase</span><span class="status-badge status-pending" data-status-badge="">⏳ Pendiente</span></a>
+<a class="class-link" data-progress-id="3D-grafica/u1/Clase_8" href="archivo/3ro-medio/3D-grafica/u1/Clase_8_U1_3ro_Grafica.html"><span class="num">8</span><span class="title">Clase 8 — 3° Medio — Gráfica</span><span class="tag tag-clase">Clase</span><span class="status-badge status-pending" data-status-badge="">⏳ Pendiente</span></a>
+<a class="class-link" data-progress-id="3D-grafica/u1/Clase_9" href="archivo/3ro-medio/3D-grafica/u1/Clase_9_U1_3ro_Grafica.html"><span class="num">9</span><span class="title">Clase 9 — 3° Medio — Gráfica</span><span class="tag tag-clase">Clase</span><span class="status-badge status-pending" data-status-badge="">⏳ Pendiente</span></a>
+</div>
+</div>
+<div class="unit-group">
+<div class="unit-title" onclick="toggleUnit(this)"><span>📋 Instrumentos de Evaluación</span><span class="arrow">▶</span></div>
+<div class="unit-classes">
+<a class="class-link" href="archivo/3ro-medio/instrumentos/diagnostico_3ro_grafica.html"><span class="num">📝</span><span class="title">Evaluación Diagnóstica — 3°D Gráfica</span><span class="tag tag-eval">Diagnóstico</span></a>
+<a class="class-link" href="archivo/3ro-medio/instrumentos/rubrica_presentacion_oral.html"><span class="num">📋</span><span class="title">Rúbrica — My Technical Skills</span><span class="tag tag-eval">Rúbrica</span></a>
+</div>
+</div>
+</div>
+<div class="course-section" data-search="3ro e electronica">
+<div class="course-header">
+<div class="course-icon color-electron">🔌</div>
+<div>
+<h3>3°E — Electrónica</h3>
+<span>Especialidad técnica</span>
+</div>
+</div>
+<div class="unit-group">
+<div class="unit-title" onclick="toggleUnit(this)"><span>📁 Unidad 1 — Technical Skills &amp; Career Paths</span><span class="arrow">▶</span></div>
+<div class="unit-classes">
+<a class="class-link" data-progress-id="3E-electronica/u1/Clase_1" href="archivo/3ro-medio/3E-electronica/u1/Clase_1_U1_3roE_Electronica.html"><span class="num">1</span><span class="title">Clase 1 — 3°E — Electrónica</span><span class="tag tag-clase">Clase</span><span class="status-badge status-pending" data-status-badge="">⏳ Pendiente</span></a>
+<a class="class-link" data-progress-id="3E-electronica/u1/Clase_2" href="archivo/3ro-medio/3E-electronica/u1/Clase_2_U1_3roE_Electronica.html"><span class="num">2</span><span class="title">Clase 2 — 3°E — Electrónica</span><span class="tag tag-clase">Clase</span><span class="status-badge status-pending" data-status-badge="">⏳ Pendiente</span></a>
+<a class="class-link" data-progress-id="3E-electronica/u1/Clase_3" href="archivo/3ro-medio/3E-electronica/u1/Clase_3_U1_3ro_Electronica.html"><span class="num">3</span><span class="title">Clase 3 — 3° Medio — Electrónica</span><span class="tag tag-clase">Clase</span><span class="status-badge status-pending" data-status-badge="">⏳ Pendiente</span></a>
+<a class="class-link" data-progress-id="3E-electronica/u1/Clase_4" href="archivo/3ro-medio/3E-electronica/u1/Clase_4_U1_3ro_Electronica.html"><span class="num">4</span><span class="title">Clase 4 — 3° Medio — Electrónica</span><span class="tag tag-clase">Clase</span><span class="status-badge status-pending" data-status-badge="">⏳ Pendiente</span></a>
+<a class="class-link" data-progress-id="3E-electronica/u1/Clase_5" href="archivo/3ro-medio/3E-electronica/u1/Clase_5_U1_3ro_Electronica.html"><span class="num">5</span><span class="title">Clase 5 — 3° Medio — Electrónica</span><span class="tag tag-clase">Clase</span><span class="status-badge status-pending" data-status-badge="">⏳ Pendiente</span></a>
+<a class="class-link" data-progress-id="3E-electronica/u1/Clase_6" href="archivo/3ro-medio/3E-electronica/u1/Clase_6_U1_3ro_Electronica.html"><span class="num">6</span><span class="title">Clase 6 — 3° Medio — Electrónica</span><span class="tag tag-clase">Clase</span><span class="status-badge status-pending" data-status-badge="">⏳ Pendiente</span></a>
+<a class="class-link" data-progress-id="3E-electronica/u1/Clase_7" href="archivo/3ro-medio/3E-electronica/u1/Clase_7_U1_3ro_Electronica.html"><span class="num">7</span><span class="title">Clase 7 — 3° Medio — Electrónica</span><span class="tag tag-clase">Clase</span><span class="status-badge status-pending" data-status-badge="">⏳ Pendiente</span></a>
+<a class="class-link" data-progress-id="3E-electronica/u1/Clase_8" href="archivo/3ro-medio/3E-electronica/u1/Clase_8_U1_3ro_Electronica.html"><span class="num">8</span><span class="title">Clase 8 — 3° Medio — Electrónica</span><span class="tag tag-clase">Clase</span><span class="status-badge status-pending" data-status-badge="">⏳ Pendiente</span></a>
+<a class="class-link" data-progress-id="3E-electronica/u1/Clase_9" href="archivo/3ro-medio/3E-electronica/u1/Clase_9_U1_3ro_Electronica.html"><span class="num">9</span><span class="title">Clase 9 — 3° Medio — Electrónica</span><span class="tag tag-clase">Clase</span><span class="status-badge status-pending" data-status-badge="">⏳ Pendiente</span></a>
+</div>
+</div>
+<div class="unit-group">
+<div class="unit-title" onclick="toggleUnit(this)"><span>📋 Instrumentos de Evaluación</span><span class="arrow">▶</span></div>
+<div class="unit-classes">
+<a class="class-link" href="archivo/3ro-medio/instrumentos/diagnostico_3ro_electronica.html"><span class="num">📝</span><span class="title">Evaluación Diagnóstica — 3°E Electrónica</span><span class="tag tag-eval">Diagnóstico</span></a>
+<a class="class-link" href="archivo/3ro-medio/instrumentos/rubrica_presentacion_oral.html"><span class="num">📋</span><span class="title">Rúbrica — My Technical Skills</span><span class="tag tag-eval">Rúbrica</span></a>
+</div>
+</div>
+</div>
+</div>
+<!-- ======================== 4° MEDIO ======================== -->
+<div class="level-content" id="level-4to">
+<div class="course-section" data-search="4to a mecanica industrial">
+<div class="course-header">
+<div class="course-icon color-mec-ind">⚙️</div>
+<div>
+<h3>4°A — Mecánica Industrial</h3>
+<span>Especialidad técnica</span>
+</div>
+</div>
+<div class="unit-group">
+<div class="unit-title" onclick="toggleUnit(this)"><span>📁 Unidad 1</span><span class="arrow">▶</span></div>
+<div class="unit-classes">
+<a class="class-link" data-progress-id="4A-industrial/u1/Clase_1" href="archivo/4to-medio/4A-industrial/u1/Clase_1_U1_4toA_Industrial.html"><span class="num">1</span><span class="title">Clase 1 — 4°A — Mecánica Industrial</span><span class="tag tag-clase">Clase</span><span class="status-badge status-pending" data-status-badge="">⏳ Pendiente</span></a>
+<a class="class-link" data-progress-id="4A-industrial/u1/Clase_2" href="archivo/4to-medio/4A-industrial/u1/Clase_2_U1_4toA_Industrial.html"><span class="num">2</span><span class="title">Clase 2 — 4°A — Mecánica Industrial</span><span class="tag tag-clase">Clase</span><span class="status-badge status-pending" data-status-badge="">⏳ Pendiente</span></a>
+<a class="class-link" data-progress-id="4A-industrial/u1/Clase_3" href="archivo/4to-medio/4A-industrial/u1/Clase_3_U1_4to_Industrial.html"><span class="num">3</span><span class="title">Clase 3 — 4° Medio — Mecánica Industrial</span><span class="tag tag-clase">Clase</span><span class="status-badge status-pending" data-status-badge="">⏳ Pendiente</span></a>
+<a class="class-link" data-progress-id="4A-industrial/u1/Clase_4" href="archivo/4to-medio/4A-industrial/u1/Clase_4_U1_4to_Industrial.html"><span class="num">4</span><span class="title">Clase 4 — 4° Medio — Mecánica Industrial</span><span class="tag tag-clase">Clase</span><span class="status-badge status-pending" data-status-badge="">⏳ Pendiente</span></a>
+<a class="class-link" data-progress-id="4A-industrial/u1/Clase_5" href="archivo/4to-medio/4A-industrial/u1/Clase_5_U1_4to_Industrial.html"><span class="num">5</span><span class="title">Clase 5 — 4° Medio — Mecánica Industrial</span><span class="tag tag-clase">Clase</span><span class="status-badge status-pending" data-status-badge="">⏳ Pendiente</span></a>
+<a class="class-link" data-progress-id="4A-industrial/u1/Clase_6" href="archivo/4to-medio/4A-industrial/u1/Clase_6_U1_4to_Industrial.html"><span class="num">6</span><span class="title">Clase 6 — 4° Medio — Mecánica Industrial</span><span class="tag tag-clase">Clase</span><span class="status-badge status-pending" data-status-badge="">⏳ Pendiente</span></a>
+<a class="class-link" data-progress-id="4A-industrial/u1/Clase_7" href="archivo/4to-medio/4A-industrial/u1/Clase_7_U1_4to_Industrial.html"><span class="num">7</span><span class="title">Clase 7 — 4° Medio — Mecánica Industrial</span><span class="tag tag-clase">Clase</span><span class="status-badge status-pending" data-status-badge="">⏳ Pendiente</span></a>
+<a class="class-link" data-progress-id="4A-industrial/u1/Clase_8" href="archivo/4to-medio/4A-industrial/u1/Clase_8_U1_4to_Industrial.html"><span class="num">8</span><span class="title">Clase 8 — 4° Medio — Mecánica Industrial</span><span class="tag tag-clase">Clase</span><span class="status-badge status-pending" data-status-badge="">⏳ Pendiente</span></a>
+</div>
+</div>
+</div>
+<div class="course-section" data-search="4to b mecanica automotriz">
+<div class="course-header">
+<div class="course-icon color-mec-auto">🚗</div>
+<div>
+<h3>4°B — Mecánica Automotriz</h3>
+<span>Especialidad técnica</span>
+</div>
+</div>
+<div class="unit-group">
+<div class="unit-title" onclick="toggleUnit(this)"><span>📁 Unidad 1</span><span class="arrow">▶</span></div>
+<div class="unit-classes">
+<a class="class-link" data-progress-id="4B-automotriz/u1/Clase_1" href="archivo/4to-medio/4B-automotriz/u1/Clase_1_U1_4toB_Automotriz.html"><span class="num">1</span><span class="title">Clase 1 — 4°B — Mecánica Automotriz</span><span class="tag tag-clase">Clase</span><span class="status-badge status-pending" data-status-badge="">⏳ Pendiente</span></a>
+<a class="class-link" data-progress-id="4B-automotriz/u1/Clase_2" href="archivo/4to-medio/4B-automotriz/u1/Clase_2_U1_4toB_Automotriz.html"><span class="num">2</span><span class="title">Clase 2 — 4°B — Mecánica Automotriz</span><span class="tag tag-clase">Clase</span><span class="status-badge status-pending" data-status-badge="">⏳ Pendiente</span></a>
+<a class="class-link" data-progress-id="4B-automotriz/u1/Clase_3" href="archivo/4to-medio/4B-automotriz/u1/Clase_3_U1_4to_Automotriz.html"><span class="num">3</span><span class="title">Clase 3 — 4° Medio — Mecánica Automotriz</span><span class="tag tag-clase">Clase</span><span class="status-badge status-pending" data-status-badge="">⏳ Pendiente</span></a>
+<a class="class-link" data-progress-id="4B-automotriz/u1/Clase_4" href="archivo/4to-medio/4B-automotriz/u1/Clase_4_U1_4to_Automotriz.html"><span class="num">4</span><span class="title">Clase 4 — 4° Medio — Mecánica Automotriz</span><span class="tag tag-clase">Clase</span><span class="status-badge status-pending" data-status-badge="">⏳ Pendiente</span></a>
+<a class="class-link" data-progress-id="4B-automotriz/u1/Clase_5" href="archivo/4to-medio/4B-automotriz/u1/Clase_5_U1_4to_Automotriz.html"><span class="num">5</span><span class="title">Clase 5 — 4° Medio — Mecánica Automotriz</span><span class="tag tag-clase">Clase</span><span class="status-badge status-pending" data-status-badge="">⏳ Pendiente</span></a>
+<a class="class-link" data-progress-id="4B-automotriz/u1/Clase_6" href="archivo/4to-medio/4B-automotriz/u1/Clase_6_U1_4to_Automotriz.html"><span class="num">6</span><span class="title">Clase 6 — 4° Medio — Mecánica Automotriz</span><span class="tag tag-clase">Clase</span><span class="status-badge status-pending" data-status-badge="">⏳ Pendiente</span></a>
+<a class="class-link" data-progress-id="4B-automotriz/u1/Clase_7" href="archivo/4to-medio/4B-automotriz/u1/Clase_7_U1_4to_Automotriz.html"><span class="num">7</span><span class="title">Clase 7 — 4° Medio — Mecánica Automotriz</span><span class="tag tag-clase">Clase</span><span class="status-badge status-pending" data-status-badge="">⏳ Pendiente</span></a>
+<a class="class-link" data-progress-id="4B-automotriz/u1/Clase_8" href="archivo/4to-medio/4B-automotriz/u1/Clase_8_U1_4to_Automotriz.html"><span class="num">8</span><span class="title">Clase 8 — 4° Medio — Mecánica Automotriz</span><span class="tag tag-clase">Clase</span><span class="status-badge status-pending" data-status-badge="">⏳ Pendiente</span></a>
+</div>
+</div>
+</div>
+<div class="course-section" data-search="4to c electricidad">
+<div class="course-header">
+<div class="course-icon color-elec">⚡</div>
+<div>
+<h3>4°C — Electricidad</h3>
+<span>Especialidad técnica</span>
+</div>
+</div>
+<div class="unit-group">
+<div class="unit-title" onclick="toggleUnit(this)"><span>📁 Unidad 1</span><span class="arrow">▶</span></div>
+<div class="unit-classes">
+<a class="class-link" data-progress-id="4C-electricidad/u1/Clase_1" href="archivo/4to-medio/4C-electricidad/u1/Clase_1_U1_4toC_Electricidad.html"><span class="num">1</span><span class="title">Clase 1 — 4°C — Electricidad</span><span class="tag tag-clase">Clase</span><span class="status-badge status-pending" data-status-badge="">⏳ Pendiente</span></a>
+<a class="class-link" data-progress-id="4C-electricidad/u1/Clase_2" href="archivo/4to-medio/4C-electricidad/u1/Clase_2_U1_4toC_Electricidad.html"><span class="num">2</span><span class="title">Clase 2 — 4°C — Electricidad</span><span class="tag tag-clase">Clase</span><span class="status-badge status-pending" data-status-badge="">⏳ Pendiente</span></a>
+<a class="class-link" data-progress-id="4C-electricidad/u1/Clase_3" href="archivo/4to-medio/4C-electricidad/u1/Clase_3_U1_4to_Electricidad.html"><span class="num">3</span><span class="title">Clase 3 — 4° Medio — Electricidad</span><span class="tag tag-clase">Clase</span><span class="status-badge status-pending" data-status-badge="">⏳ Pendiente</span></a>
+<a class="class-link" data-progress-id="4C-electricidad/u1/Clase_4" href="archivo/4to-medio/4C-electricidad/u1/Clase_4_U1_4to_Electricidad.html"><span class="num">4</span><span class="title">Clase 4 — 4° Medio — Electricidad</span><span class="tag tag-clase">Clase</span><span class="status-badge status-pending" data-status-badge="">⏳ Pendiente</span></a>
+<a class="class-link" data-progress-id="4C-electricidad/u1/Clase_5" href="archivo/4to-medio/4C-electricidad/u1/Clase_5_U1_4to_Electricidad.html"><span class="num">5</span><span class="title">Clase 5 — 4° Medio — Electricidad</span><span class="tag tag-clase">Clase</span><span class="status-badge status-pending" data-status-badge="">⏳ Pendiente</span></a>
+<a class="class-link" data-progress-id="4C-electricidad/u1/Clase_6" href="archivo/4to-medio/4C-electricidad/u1/Clase_6_U1_4to_Electricidad.html"><span class="num">6</span><span class="title">Clase 6 — 4° Medio — Electricidad</span><span class="tag tag-clase">Clase</span><span class="status-badge status-pending" data-status-badge="">⏳ Pendiente</span></a>
+<a class="class-link" data-progress-id="4C-electricidad/u1/Clase_7" href="archivo/4to-medio/4C-electricidad/u1/Clase_7_U1_4to_Electricidad.html"><span class="num">7</span><span class="title">Clase 7 — 4° Medio — Electricidad</span><span class="tag tag-clase">Clase</span><span class="status-badge status-pending" data-status-badge="">⏳ Pendiente</span></a>
+<a class="class-link" data-progress-id="4C-electricidad/u1/Clase_8" href="archivo/4to-medio/4C-electricidad/u1/Clase_8_U1_4to_Electricidad.html"><span class="num">8</span><span class="title">Clase 8 — 4° Medio — Electricidad</span><span class="tag tag-clase">Clase</span><span class="status-badge status-pending" data-status-badge="">⏳ Pendiente</span></a>
+</div>
+</div>
+</div>
+
+<div class="course-section" data-search="4to d grafica">
+<div class="course-header">
+<div class="course-icon color-graf">🎨</div>
+<div><h3>4°D — Gráfica</h3><span>Especialidad técnica</span></div>
+</div>
+<div class="unit-group">
+<div class="unit-title" onclick="toggleUnit(this)"><span>📁 Unidad 1</span><span class="arrow">▶</span></div>
+<div class="unit-classes"><div class="empty-state"><div class="icon">🚧</div><p>Materiales en preparación</p></div></div>
+</div>
+</div>
+
+<div class="course-section" data-search="4to e electronica">
+<div class="course-header">
+<div class="course-icon color-electron">🔌</div>
+<div>
+<h3>4°E — Electrónica</h3>
+<span>Especialidad técnica</span>
+</div>
+</div>
+<div class="unit-group">
+<div class="unit-title" onclick="toggleUnit(this)"><span>📁 Unidad 1</span><span class="arrow">▶</span></div>
+<div class="unit-classes">
+<a class="class-link" data-progress-id="4E-electronica/u1/Clase_1" href="archivo/4to-medio/4E-electronica/u1/Clase_1_U1_4toE_Electronica.html"><span class="num">1</span><span class="title">Clase 1 — 4°E — Electrónica</span><span class="tag tag-clase">Clase</span><span class="status-badge status-pending" data-status-badge="">⏳ Pendiente</span></a>
+<a class="class-link" data-progress-id="4E-electronica/u1/Clase_2" href="archivo/4to-medio/4E-electronica/u1/Clase_2_U1_4toE_Electronica.html"><span class="num">2</span><span class="title">Clase 2 — 4°E — Electrónica</span><span class="tag tag-clase">Clase</span><span class="status-badge status-pending" data-status-badge="">⏳ Pendiente</span></a>
+<a class="class-link" data-progress-id="4E-electronica/u1/Clase_3" href="archivo/4to-medio/4E-electronica/u1/Clase_3_U1_4to_Electronica.html"><span class="num">3</span><span class="title">Clase 3 — 4° Medio — Electrónica</span><span class="tag tag-clase">Clase</span><span class="status-badge status-pending" data-status-badge="">⏳ Pendiente</span></a>
+<a class="class-link" data-progress-id="4E-electronica/u1/Clase_4" href="archivo/4to-medio/4E-electronica/u1/Clase_4_U1_4to_Electronica.html"><span class="num">4</span><span class="title">Clase 4 — 4° Medio — Electrónica</span><span class="tag tag-clase">Clase</span><span class="status-badge status-pending" data-status-badge="">⏳ Pendiente</span></a>
+<a class="class-link" data-progress-id="4E-electronica/u1/Clase_5" href="archivo/4to-medio/4E-electronica/u1/Clase_5_U1_4to_Electronica.html"><span class="num">5</span><span class="title">Clase 5 — 4° Medio — Electrónica</span><span class="tag tag-clase">Clase</span><span class="status-badge status-pending" data-status-badge="">⏳ Pendiente</span></a>
+<a class="class-link" data-progress-id="4E-electronica/u1/Clase_6" href="archivo/4to-medio/4E-electronica/u1/Clase_6_U1_4to_Electronica.html"><span class="num">6</span><span class="title">Clase 6 — 4° Medio — Electrónica</span><span class="tag tag-clase">Clase</span><span class="status-badge status-pending" data-status-badge="">⏳ Pendiente</span></a>
+<a class="class-link" data-progress-id="4E-electronica/u1/Clase_7" href="archivo/4to-medio/4E-electronica/u1/Clase_7_U1_4to_Electronica.html"><span class="num">7</span><span class="title">Clase 7 — 4° Medio — Electrónica</span><span class="tag tag-clase">Clase</span><span class="status-badge status-pending" data-status-badge="">⏳ Pendiente</span></a>
+<a class="class-link" data-progress-id="4E-electronica/u1/Clase_8" href="archivo/4to-medio/4E-electronica/u1/Clase_8_U1_4to_Electronica.html"><span class="num">8</span><span class="title">Clase 8 — 4° Medio — Electrónica</span><span class="tag tag-clase">Clase</span><span class="status-badge status-pending" data-status-badge="">⏳ Pendiente</span></a>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="footer">
+<p>Materiales de Clases — Inglés 2026 — tranquiprofe.cl</p>
+</div>
+<script>
+    // ==================== EVALUATION CLASS IDS ====================
+    const EVAL_IDS = new Set([
+        '1ro-lu-ju/u1/Clase_15', '1ro-lu-ju/u1/Clase_16', '1ro-lu-ju/u1/Clase_17',
+        '3A-industrial/u1/Clase_8', '3B-automotriz/u1/Clase_8', '3C-electricidad/u1/Clase_8',
+        '3D-grafica/u1/Clase_8', '3E-electronica/u1/Clase_8',
+        '4A-industrial/u1/Clase_5', '4B-automotriz/u1/Clase_5',
+        '4C-electricidad/u1/Clase_5', '4E-electronica/u1/Clase_5'
+    ]);
+
+    function switchLevel(level) {
+        document.querySelectorAll('.level-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.level-content').forEach(c => c.classList.remove('active'));
+        event.target.classList.add('active');
+        document.getElementById('level-' + level).classList.add('active');
+    }
+
+    function toggleUnit(el) {
+        el.classList.toggle('open');
+        el.nextElementSibling.classList.toggle('open');
+    }
+
+    function filterMaterials() {
+        const query = document.getElementById('searchInput').value.toLowerCase();
+        const sections = document.querySelectorAll('.course-section');
+        const links = document.querySelectorAll('.class-link');
+
+        if (!query) {
+            sections.forEach(s => s.style.display = '');
+            links.forEach(l => l.style.display = '');
+            return;
+        }
+
+        document.querySelectorAll('.level-content').forEach(c => c.classList.add('active'));
+        document.querySelectorAll('.level-tab').forEach(t => t.classList.remove('active'));
+
+        sections.forEach(s => {
+            const searchData = (s.dataset.search || '') + ' ' + s.textContent.toLowerCase();
+            s.style.display = searchData.includes(query) ? '' : 'none';
+            if (searchData.includes(query)) {
+                s.querySelectorAll('.unit-title').forEach(u => u.classList.add('open'));
+                s.querySelectorAll('.unit-classes').forEach(u => u.classList.add('open'));
+            }
+        });
+    }
+
+    // ==================== PROGRESS (SERVER-SIDE) ====================
+    let doneSet = new Set();
+    let saving = false;
+
+    async function loadProgressFromServer() {
+        try {
+            const resp = await fetch('api/progress', { credentials: 'same-origin' });
+            if (!resp.ok) return;
+            const data = await resp.json();
+            doneSet = new Set(data.done || []);
+        } catch (e) {
+            console.log('Progress load error:', e);
+        }
+    }
+
+    async function saveProgressToServer() {
+        if (saving) return;
+        saving = true;
+        try {
+            await fetch('api/progress', {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ done: Array.from(doneSet) })
+            });
+        } catch (e) {
+            console.log('Progress save error:', e);
+        } finally {
+            saving = false;
+        }
+    }
+
+    // ==================== TOGGLE STATUS ====================
+    function toggleStatus(btn, id) {
+        if (doneSet.has(id)) {
+            doneSet.delete(id);
+        } else {
+            doneSet.add(id);
+        }
+        applyStatus(btn.closest('.class-link'), id);
+        updateDashboard();
+        saveProgressToServer();
+    }
+
+    function applyStatus(link, id) {
+        const btn = link.querySelector('.toggle-status');
+        if (doneSet.has(id)) {
+            btn.textContent = '✅ Realizada';
+            btn.className = 'toggle-status realizada';
+            link.classList.add('done');
+        } else {
+            btn.textContent = '❌ No Realizada';
+            btn.className = 'toggle-status no-realizada';
+            link.classList.remove('done');
+        }
+    }
+
+    function updateDashboard() {
+        const allLinks = document.querySelectorAll('.class-link[data-progress-id]');
+        let done = 0, total = 0;
+        allLinks.forEach(link => {
+            total++;
+            if (doneSet.has(link.dataset.progressId)) done++;
+        });
+        document.getElementById('statDone').textContent = done;
+        document.getElementById('statPending').textContent = total - done;
+        document.getElementById('statTotal').textContent = total;
+    }
+
+    function resetProgress() {
+        if (!confirm('¿Estás seguro de que quieres resetear todo el marcaje?\nEsto marcará todas las clases como "No Realizada".')) return;
+        doneSet.clear();
+        document.querySelectorAll('.class-link[data-progress-id]').forEach(link => {
+            applyStatus(link, link.dataset.progressId);
+        });
+        updateDashboard();
+        saveProgressToServer();
+    }
+
+    // ==================== INIT ====================
+    async function initMateriales() {
+        await loadProgressFromServer();
+
+        const allLinks = document.querySelectorAll('.class-link[data-progress-id]');
+        allLinks.forEach(link => {
+            const id = link.dataset.progressId;
+
+            // Mark evaluation classes
+            if (EVAL_IDS.has(id)) {
+                const tag = link.querySelector('.tag');
+                if (tag) {
+                    tag.className = 'tag tag-eval';
+                    tag.textContent = 'Evaluación';
+                }
+            }
+
+            // Replace status badge with toggle button
+            const badge = link.querySelector('[data-status-badge]');
+            if (badge) {
+                const btn = document.createElement('button');
+                btn.className = 'toggle-status no-realizada';
+                btn.textContent = '❌ No Realizada';
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    toggleStatus(this, id);
+                });
+                badge.replaceWith(btn);
+            }
+
+            // Apply saved status
+            applyStatus(link, id);
+        });
+        updateDashboard();
+    }
+
+    initMateriales();
+</script>
+</body>
+</html>
